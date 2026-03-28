@@ -2,36 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081';
-
-const getPasswordChecks = (password) => ({
-    minLength: password.length >= 12,
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /\d/.test(password),
-    hasSpecial: /[^A-Za-z\d]/.test(password),
-    hasNoSpaces: !/\s/.test(password)
-});
-
-const getPasswordStrength = (checks) => {
-    const passed = Object.values(checks).filter(Boolean).length;
-    const percent = Math.round((passed / 6) * 100);
-
-    if (passed <= 2) {
-        return { label: 'Weak', color: '#e53e3e', percent, isValid: false };
-    }
-
-    if (passed <= 4) {
-        return { label: 'Medium', color: '#dd6b20', percent, isValid: false };
-    }
-
-    if (passed === 5) {
-        return { label: 'Strong', color: '#2f855a', percent, isValid: false };
-    }
-
-    return { label: 'Very Strong', color: '#276749', percent, isValid: true };
-};
-
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
         username: '',
@@ -40,14 +10,10 @@ const RegisterPage = () => {
         lastName: '',
         email: ''
     });
-    const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState(''); // 'error' or 'success'
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const passwordChecks = getPasswordChecks(formData.password);
-    const passwordStrength = getPasswordStrength(passwordChecks);
-    const hasPasswordInput = formData.password.length > 0;
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -57,18 +23,11 @@ const RegisterPage = () => {
         e.preventDefault();
         setMessage('');
         setMessageType('');
-
-        if (!passwordStrength.isValid) {
-            setMessage('Password does not meet the required strength rules.');
-            setMessageType('error');
-            return;
-        }
-
         setIsLoading(true);
 
         try {
             // FRS Requirement: POST /api/auth/register
-            const response = await axios.post(`${API_BASE_URL}/api/auth/register`, formData);
+            const response = await axios.post('http://localhost:8080/api/auth/register', formData);
             
             if (response.status === 201 || response.status === 200) {
                 // Activity Diagram: 201 Created -> Redirect to Login
@@ -80,7 +39,7 @@ const RegisterPage = () => {
             }
         } catch (err) {
             // Show error if user already exists or server is down
-            setMessage(err.response?.data?.message || 'Registration failed. Please check backend connection and try again.');
+            setMessage(err.response?.data?.message || 'Registration failed. Try a different username.');
             setMessageType('error');
         } finally {
             setIsLoading(false);
@@ -159,71 +118,17 @@ const RegisterPage = () => {
 
                         <div style={styles.inputGroup}>
                             <label style={styles.label}>Password</label>
-                            <div style={styles.passwordWrapper}>
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="password"
-                                    placeholder="Create a strong password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                    minLength="12"
-                                    style={{ ...styles.input, ...styles.passwordInput }}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword((prev) => !prev)}
-                                    style={styles.passwordToggleBtn}
-                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                >
-                                    <svg style={styles.eyeIcon} viewBox="0 0 24 24" fill="currentColor">
-                                        {showPassword ? (
-                                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-                                        ) : (
-                                            <path d="M11.83 9L15.23 12.39c.75-1.48.75-2.74.75-2.74s0-2.5-1.41-4.01C13.53 5 11.46 5 11.46 5L11.83 9zM2 4.27l2.21 2.21c.44.44 1.08.66 1.72.66.66 0 1.3-.22 1.75-.66l2.06 2.06c-.33.11-.66.23-.98.35l2.15 2.15c.25-.08.5-.16.74-.25l2.06 2.06c-.98 1.06-2.39 1.7-3.98 1.7-2.76 0-5-2.24-5-5 0-1.59.64-3 1.7-3.98L2 4.27zM12 4.5c-2.76 0-5 2.24-5 5 0 .65.13 1.29.36 1.85l2.21 2.21c.7.5 1.55.82 2.47.82 2.76 0 5-2.24 5-5 0-.91-.32-1.77-.82-2.47l-2.22-2.21c-.56-.23-1.2-.36-1.85-.36z" />
-                                        )}
-                                    </svg>
-                                </button>
-                            </div>
-                            <span style={styles.hint}>Minimum 12 characters</span>
-
-                            {hasPasswordInput && (
-                                <>
-                                    <div style={styles.passwordMeter}>
-                                        <div
-                                            style={{
-                                                ...styles.passwordMeterFill,
-                                                width: `${passwordStrength.percent}%`,
-                                                backgroundColor: passwordStrength.color
-                                            }}
-                                        ></div>
-                                    </div>
-                                    <span style={{ ...styles.passwordStrengthText, color: passwordStrength.color }}>
-                                        Strength: {passwordStrength.label}
-                                    </span>
-
-                                    <div style={styles.passwordRuleList}>
-                                        <span style={passwordChecks.minLength ? styles.passwordRuleMet : styles.passwordRuleUnmet}>
-                                            {passwordChecks.minLength ? 'OK' : 'X'} At least 12 characters
-                                        </span>
-                                        <span style={passwordChecks.hasUppercase ? styles.passwordRuleMet : styles.passwordRuleUnmet}>
-                                            {passwordChecks.hasUppercase ? 'OK' : 'X'} One uppercase letter
-                                        </span>
-                                        <span style={passwordChecks.hasLowercase ? styles.passwordRuleMet : styles.passwordRuleUnmet}>
-                                            {passwordChecks.hasLowercase ? 'OK' : 'X'} One lowercase letter
-                                        </span>
-                                        <span style={passwordChecks.hasNumber ? styles.passwordRuleMet : styles.passwordRuleUnmet}>
-                                            {passwordChecks.hasNumber ? 'OK' : 'X'} One number
-                                        </span>
-                                        <span style={passwordChecks.hasSpecial ? styles.passwordRuleMet : styles.passwordRuleUnmet}>
-                                            {passwordChecks.hasSpecial ? 'OK' : 'X'} One special character
-                                        </span>
-                                        <span style={passwordChecks.hasNoSpaces ? styles.passwordRuleMet : styles.passwordRuleUnmet}>
-                                            {passwordChecks.hasNoSpaces ? 'OK' : 'X'} No spaces
-                                        </span>
-                                    </div>
-                                </>
-                            )}
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Create a password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                minLength="6"
+                                style={styles.input}
+                            />
+                            <span style={styles.hint}>Minimum 6 characters</span>
                         </div>
 
                         {message && (
@@ -362,70 +267,10 @@ const styles = {
         fontFamily: 'inherit',
         color: 'var(--text-primary)'
     },
-    passwordWrapper: {
-        position: 'relative',
-        width: '100%'
-    },
-    passwordInput: {
-        paddingRight: '45px',
-        width: '100%',
-        boxSizing: 'border-box'
-    },
-    passwordToggleBtn: {
-        position: 'absolute',
-        right: '0',
-        top: '0',
-        bottom: '0',
-        border: 'none',
-        background: 'transparent',
-        color: '#5a67d8',
-        cursor: 'pointer',
-        padding: '0 12px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    eyeIcon: {
-        width: '18px',
-        height: '18px'
-    },
     hint: {
         fontSize: '12px',
         color: 'var(--text-muted)',
         marginTop: '4px'
-    },
-    passwordMeter: {
-        height: '8px',
-        backgroundColor: '#e2e8f0',
-        borderRadius: '999px',
-        overflow: 'hidden',
-        marginTop: '8px'
-    },
-    passwordMeterFill: {
-        height: '100%',
-        width: '0%',
-        transition: 'width 0.25s ease, background-color 0.25s ease'
-    },
-    passwordStrengthText: {
-        fontSize: '12px',
-        fontWeight: '600',
-        marginTop: '6px'
-    },
-    passwordRuleList: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '4px',
-        marginTop: '8px'
-    },
-    passwordRuleMet: {
-        fontSize: '12px',
-        color: '#2f855a',
-        fontWeight: '500'
-    },
-    passwordRuleUnmet: {
-        fontSize: '12px',
-        color: '#a0aec0',
-        fontWeight: '500'
     },
     button: {
         padding: '16px',
