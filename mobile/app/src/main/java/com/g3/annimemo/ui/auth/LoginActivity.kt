@@ -2,7 +2,7 @@ package com.g3.annimemo.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.g3.annimemo.MainActivity
@@ -32,25 +32,60 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
+        setupUI()
+    }
+
+    private fun setupUI() {
+        // Login button click listener
         binding.btnLogin.setOnClickListener {
             val identifier = binding.etIdentifier.text.toString().trim()
             val password = binding.etPassword.text.toString()
 
-            if (identifier.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
+            // Validate inputs
+            if (!validateInputs(identifier, password)) {
                 return@setOnClickListener
             }
 
             performLogin(identifier, password)
         }
 
+        // Register redirect click listener
         binding.tvRegisterRedirect.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 
+    private fun validateInputs(identifier: String, password: String): Boolean {
+        // Clear previous errors
+        binding.errorContainer.visibility = View.GONE
+
+        // Validate identifier
+        if (identifier.isEmpty()) {
+            showError("Please enter your username or email")
+            binding.tilIdentifier.error = "Required"
+            return false
+        }
+
+        // Validate password
+        if (password.isEmpty()) {
+            showError("Please enter your password")
+            binding.tilPassword.error = "Required"
+            return false
+        }
+
+        if (password.length < 6) {
+            showError("Password must be at least 6 characters")
+            binding.tilPassword.error = "Too short"
+            return false
+        }
+
+        return true
+    }
+
     private fun performLogin(identifier: String, pass: String) {
         binding.btnLogin.isEnabled = false
+        binding.loadingIndicator.visibility = View.VISIBLE
+        binding.errorContainer.visibility = View.GONE
         
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -59,22 +94,37 @@ class LoginActivity : AppCompatActivity() {
                 
                 withContext(Dispatchers.Main) {
                     binding.btnLogin.isEnabled = true
+                    binding.loadingIndicator.visibility = View.GONE
+                    
                     if (response.isSuccessful && response.body() != null) {
                         val authResponse = response.body()!!
                         tokenManager.saveToken(authResponse.token)
-                        Toast.makeText(this@LoginActivity, "Login Successful!", Toast.LENGTH_SHORT).show()
+                        
+                        // Navigate to MainActivity
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
                     } else {
-                        Toast.makeText(this@LoginActivity, "Invalid login credentials", Toast.LENGTH_SHORT).show()
+                        val errorMessage = when (response.code()) {
+                            401 -> "Invalid login credentials"
+                            404 -> "User not found"
+                            500 -> "Server error. Please try again later"
+                            else -> "Login failed: ${response.message()}"
+                        }
+                        showError(errorMessage)
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     binding.btnLogin.isEnabled = true
-                    Toast.makeText(this@LoginActivity, "Network Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    binding.loadingIndicator.visibility = View.GONE
+                    showError("Network error: ${e.message ?: "Connection failed"}")
                 }
             }
         }
+    }
+
+    private fun showError(message: String) {
+        binding.errorContainer.visibility = View.VISIBLE
+        binding.errorMessage.text = message
     }
 }

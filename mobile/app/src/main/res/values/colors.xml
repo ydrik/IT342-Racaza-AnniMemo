@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary colors - Purple/Blue gradient -->
     <color name="primary">#667eea</color>
     <color name="primary_dark">#5a67d8</color>
+    <color name="primary_light">#7c9aff</color>
     <color name="secondary">#764ba2</color>
+    <color name="secondary_light">#9d6bb0</color>
+    
+    <!-- Background colors -->
     <color name="bg_light">#f8f5ff</color>
+    <color name="bg_accent1">#e5edff</color>
+    <color name="bg_accent2">#e9f7f2</color>
     <color name="card_bg">#FFFFFF</color>
+    <color name="card_bg_surface">#f8f9fa</color>
+    
+    <!-- Text colors -->
     <color name="text_primary">#0d1b2a</color>
-    <color name="text_secondary">#5a7a8f</color>
+    <color name="text_secondary">#2d3e50</color>
+    <color name="text_muted">#5a7a8f</color>
+    
+    <!-- UI elements -->
     <color name="white">#FFFFFF</color>
+    <color name="border_light">#e2e8f0</color>
+    <color name="error">#c53030</color>
+    <color name="error_bg">#fff5f5</color>
+    <color name="success">#22863a</color>
+    <color name="success_bg">#f0f9ff</color>
 </resources>
