@@ -1,0 +1,62 @@
+[
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_activity_register.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/layout/activity_register.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/menu_bottom_nav_menu.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/menu/bottom_nav_menu.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_activity_login.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/layout/activity_login.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_activity_main.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_pets.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/layout/fragment_pets.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/drawable_bg_button_secondary.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/drawable/bg_button_secondary.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/drawable_bg_gradient_primary.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/drawable/bg_gradient_primary.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/drawable_bg_app_gradient.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/drawable/bg_app_gradient.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_profile.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/layout/fragment_profile.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/drawable-night_bg_app_gradient.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/drawable-night/bg_app_gradient.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_reminders.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/layout/fragment_reminders.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/drawable_ic_visibility.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/drawable/ic_visibility.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_dashboard.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/layout/fragment_dashboard.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/navigation_nav_graph.xml.flat",
+        "source": "com.g3.annimemo.app-main-51:/navigation/nav_graph.xml"
+    }
+]

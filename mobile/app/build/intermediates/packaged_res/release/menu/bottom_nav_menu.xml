@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:title="@string/title_dashboard" />
+    <item
+        android:id="@+id/navigation_pets"
+        android:title="@string/title_pets" />
+    <item
+        android:id="@+id/navigation_reminders"
+        android:title="@string/title_reminders" />
+    <item
+        android:id="@+id/navigation_profile"
+        android:title="@string/title_profile" />
+</menu>
