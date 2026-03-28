@@ -23,7 +23,8 @@
         android:extractNativeLibs="false"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AnniMemo" >
+        android:theme="@style/Theme.AnniMemo"
+        android:usesCleartextTraffic="true" >
         <activity
             android:name="com.g3.annimemo.ui.auth.LoginActivity"
             android:exported="true" >
