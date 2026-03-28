@@ -1,0 +1,52 @@
+# Global Git Ignore for AnniMemo Project
+
+# Document files
+*.pdf
+*.txt
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build and compiled files
+/backend/target/
+/backend/out/
+/web/build/
+/web/dist/
+
+# Dependencies
+/backend/.mvn/
+/web/node_modules/
+/web/package-lock.json
+/web/yarn.lock
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+*.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+node_modules
+node_modules
