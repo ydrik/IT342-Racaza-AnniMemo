@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.2.2" type="partial_results">
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.g3.annimemo.ui.auth.LoginActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+    <map id="UnusedResources">
+        <location id="R.color.bg_accent2"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="13"
+            column="12"
+            startOffset="468"
+            endLine="13"
+            endColumn="29"
+            endOffset="485"/>
+        <location id="R.color.text_secondary"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="19"
+            column="12"
+            startOffset="682"
+            endLine="19"
+            endColumn="33"
+            endOffset="703"/>
+        <location id="R.color.primary_light"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="6"
+            column="12"
+            startOffset="202"
+            endLine="6"
+            endColumn="32"
+            endOffset="222"/>
+        <location id="R.color.card_bg"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="14"
+            column="12"
+            startOffset="513"
+            endLine="14"
+            endColumn="26"
+            endOffset="527"/>
+        <entry
+            name="model"
+            string="attr[colorPrimaryVariant(R)],color[text_muted(U),success_bg(U),text_primary(U),bg_light(U),bg_accent1(U),bg_accent2(D),error_bg(U),error(U),secondary(U),card_bg(D),white(U),border_light(U),secondary_light(D),success(U),card_bg_surface(U),primary_dark(U),text_secondary(D),primary(U),primary_light(D)],drawable[bg_button_secondary(U),bg_gradient_primary(U),ic_visibility(U),ic_launcher_foreground(U),bg_app_gradient(U)],id[navigation_dashboard(U),tv_title(U),til_identifier(D),error_container(D),et_email(D),iv_logo(D),nav_view(U),success_container(D),text_profile(D),logo_card(U),btn_register(D),til_first_name(D),til_last_name(D),loading_indicator(D),et_password(D),error_message(D),text_pets(D),text_dashboard(D),nav_graph(D),tv_register_redirect(D),til_username(D),til_email(D),login_card(D),nav_host_fragment(U),btn_login(D),navigation_profile(U),et_identifier(D),et_last_name(D),register_card(D),til_password(D),et_username(D),success_message(D),tv_login_redirect(D),text_reminders(D),navigation_reminders(U),header_background(D),tv_subtitle(U),et_first_name(D),navigation_pets(U)],layout[fragment_pets(U),activity_login(U),fragment_dashboard(U),activity_main(U),activity_register(U),fragment_reminders(U),fragment_profile(U)],menu[bottom_nav_menu(U)],navigation[nav_graph(U)],string[title_reminders(U),app_name(U),title_pets(U),title_profile(U),title_dashboard(U)],style[Theme_AnniMemo(U),Theme_MaterialComponents_DayNight_NoActionBar(R),Widget_MaterialComponents_TextInputLayout_OutlinedBox(R)];14^5,16^12,41^18^15^b^17^12^22^1a^3d^3^f^c^50^16^7^8^1^14,43^1f^48^47,44^18^15^b^17^12^22^1a^3d^3^f^c^50^16^7^8^2^e^1^14,47^4d^4b^49^4c,48^19^4d^42^4b^40^49^45^4c^46,4e^4f^12^10^b^9^0^4;;;"/>
+        <location id="R.color.secondary_light"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="8"
+            column="12"
+            startOffset="294"
+            endLine="8"
+            endColumn="34"
+            endOffset="316"/>
+    </map>
+
+</incidents>

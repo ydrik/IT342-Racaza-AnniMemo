@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.2.2" type="incidents">
+
+    <incident
+        id="ContentDescription"
+        severity="warning"
+        message="Missing `contentDescription` attribute on image">
+        <fix-alternatives>
+            <fix-attribute
+                description="Set contentDescription"
+                namespace="http://schemas.android.com/apk/res/android"
+                attribute="contentDescription"
+                value="TODO"
+                dot="4"
+                mark="0"/>
+            <fix-attribute
+                description="Set importantForAccessibility=&quot;no&quot;"
+                namespace="http://schemas.android.com/apk/res/android"
+                attribute="importantForAccessibility"
+                value="no"/>
+        </fix-alternatives>
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="36"
+            column="14"
+            startOffset="1504"
+            endLine="36"
+            endColumn="23"
+            endOffset="1513"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Welcome to AnniMemo&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="50"
+            column="13"
+            startOffset="2069"
+            endLine="50"
+            endColumn="47"
+            endOffset="2103"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Organize and monitor your pet&apos;s health&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="64"
+            column="13"
+            startOffset="2641"
+            endLine="64"
+            endColumn="66"
+            endOffset="2694"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Login&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="99"
+            column="21"
+            startOffset="4179"
+            endLine="99"
+            endColumn="41"
+            endOffset="4199"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Username or Email&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="110"
+            column="21"
+            startOffset="4711"
+            endLine="110"
+            endColumn="53"
+            endOffset="4743"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Password&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="133"
+            column="21"
+            startOffset="5956"
+            endLine="133"
+            endColumn="44"
+            endOffset="5979"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;⚠️&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="177"
+            column="29"
+            startOffset="8221"
+            endLine="177"
+            endColumn="46"
+            endOffset="8238"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Login&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="198"
+            column="21"
+            startOffset="9219"
+            endLine="198"
+            endColumn="41"
+            endOffset="9239"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;New to AnniMemo?&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="231"
+            column="25"
+            startOffset="10636"
+            endLine="231"
+            endColumn="56"
+            endOffset="10667"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Create an account&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_login.xml"
+            line="248"
+            column="21"
+            startOffset="11382"
+            endLine="248"
+            endColumn="53"
+            endOffset="11414"/>
+    </incident>
+
+    <incident
+        id="ContentDescription"
+        severity="warning"
+        message="Missing `contentDescription` attribute on image">
+        <fix-alternatives>
+            <fix-attribute
+                description="Set contentDescription"
+                namespace="http://schemas.android.com/apk/res/android"
+                attribute="contentDescription"
+                value="TODO"
+                dot="4"
+                mark="0"/>
+            <fix-attribute
+                description="Set importantForAccessibility=&quot;no&quot;"
+                namespace="http://schemas.android.com/apk/res/android"
+                attribute="importantForAccessibility"
+                value="no"/>
+        </fix-alternatives>
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="36"
+            column="14"
+            startOffset="1504"
+            endLine="36"
+            endColumn="23"
+            endOffset="1513"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Create Account&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="50"
+            column="13"
+            startOffset="2069"
+            endLine="50"
+            endColumn="42"
+            endOffset="2098"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Join AnniMemo to start tracking your pet&apos;s health&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="64"
+            column="13"
+            startOffset="2636"
+            endLine="64"
+            endColumn="77"
+            endOffset="2700"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Register&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="99"
+            column="21"
+            startOffset="4188"
+            endLine="99"
+            endColumn="44"
+            endOffset="4211"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Username&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="110"
+            column="21"
+            startOffset="4715"
+            endLine="110"
+            endColumn="44"
+            endOffset="4738"/>
+    </incident>
+
+    <incident
+        id="DisableBaselineAlignment"
+        severity="warning"
+        message="Set `android:baselineAligned=&quot;false&quot;` on this element for better performance">
+        <fix-attribute
+            description="Set baselineAligned=&quot;false&quot;"
+            robot="true"
+            independent="true"
+            namespace="http://schemas.android.com/apk/res/android"
+            attribute="baselineAligned"
+            value="false"/>
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="129"
+            column="18"
+            startOffset="5705"
+            endLine="129"
+            endColumn="30"
+            endOffset="5717"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;First Name&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="142"
+            column="25"
+            startOffset="6351"
+            endLine="142"
+            endColumn="50"
+            endOffset="6376"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Last Name&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="167"
+            column="25"
+            startOffset="7767"
+            endLine="167"
+            endColumn="49"
+            endOffset="7791"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Email&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="191"
+            column="21"
+            startOffset="9089"
+            endLine="191"
+            endColumn="41"
+            endOffset="9109"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Password&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="215"
+            column="21"
+            startOffset="10381"
+            endLine="215"
+            endColumn="44"
+            endOffset="10404"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;⚠️&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="259"
+            column="29"
+            startOffset="12646"
+            endLine="259"
+            endColumn="46"
+            endOffset="12663"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;✓&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="297"
+            column="29"
+            startOffset="14462"
+            endLine="297"
+            endColumn="45"
+            endOffset="14478"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Registration successful! Redirecting to login...&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="309"
+            column="29"
+            startOffset="15071"
+            endLine="309"
+            endColumn="92"
+            endOffset="15134"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Create Account&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="319"
+            column="21"
+            startOffset="15580"
+            endLine="319"
+            endColumn="50"
+            endOffset="15609"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Already have an account?&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="352"
+            column="25"
+            startOffset="17006"
+            endLine="352"
+            endColumn="64"
+            endOffset="17045"/>
+    </incident>
+
+    <incident
+        id="HardcodedText"
+        severity="warning"
+        message="Hardcoded string &quot;Sign In Here&quot;, should use `@string` resource">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_register.xml"
+            line="369"
+            column="21"
+            startOffset="17754"
+            endLine="369"
+            endColumn="48"
+            endOffset="17781"/>
+    </incident>
+
+    <incident
+        id="SetTextI18n"
+        severity="warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead.">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/g3/annimemo/ui/dashboard/DashboardFragment.kt"
+            line="19"
+            column="39"
+            startOffset="650"
+            endLine="19"
+            endColumn="55"
+            endOffset="666"/>
+    </incident>
+
+    <incident
+        id="SetTextI18n"
+        severity="warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead.">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/g3/annimemo/ui/pets/PetsFragment.kt"
+            line="19"
+            column="34"
+            startOffset="620"
+            endLine="19"
+            endColumn="45"
+            endOffset="631"/>
+    </incident>
+
+    <incident
+        id="SetTextI18n"
+        severity="warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead.">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/g3/annimemo/ui/profile/ProfileFragment.kt"
+            line="19"
+            column="37"
+            startOffset="638"
+            endLine="19"
+            endColumn="51"
+            endOffset="652"/>
+    </incident>
+
+    <incident
+        id="SetTextI18n"
+        severity="warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead.">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/g3/annimemo/ui/reminders/RemindersFragment.kt"
+            line="19"
+            column="39"
+            startOffset="650"
+            endLine="19"
+            endColumn="55"
+            endOffset="666"/>
+    </incident>
+
+    <incident
+        id="OldTargetApi"
+        severity="warning"
+        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details.">
+        <fix-replace
+            description="Update targetSdkVersion to 36"
+            oldString="34"
+            replacement="36"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="13"
+            column="9"
+            startOffset="241"
+            endLine="13"
+            endColumn="23"
+            endOffset="255"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.core:core-ktx than 1.12.0 is available: 1.18.0">
+        <fix-replace
+            description="Change to 1.18.0"
+            family="Update versions"
+            oldString="1.12.0"
+            replacement="1.18.0"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="39"
+            column="21"
+            startOffset="861"
+            endLine="39"
+            endColumn="50"
+            endOffset="890"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.1">
+        <fix-replace
+            description="Change to 1.7.1"
+            family="Update versions"
+            oldString="1.6.1"
+            replacement="1.7.1"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="40"
+            column="21"
+            startOffset="913"
+            endLine="40"
+            endColumn="55"
+            endOffset="947"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of com.google.android.material:material than 1.11.0 is available: 1.13.0">
+        <fix-replace
+            description="Change to 1.13.0"
+            family="Update versions"
+            oldString="1.11.0"
+            replacement="1.13.0"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="41"
+            column="21"
+            startOffset="970"
+            endLine="41"
+            endColumn="64"
+            endOffset="1013"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.1">
+        <fix-replace
+            description="Change to 2.2.1"
+            family="Update versions"
+            oldString="2.1.4"
+            replacement="2.2.1"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="42"
+            column="21"
+            startOffset="1036"
+            endLine="42"
+            endColumn="69"
+            endOffset="1084"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.navigation:navigation-fragment-ktx than 2.7.7 is available: 2.9.7">
+        <fix-replace
+            description="Change to 2.9.7"
+            family="Update versions"
+            oldString="2.7.7"
+            replacement="2.9.7"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="45"
+            column="21"
+            startOffset="1136"
+            endLine="45"
+            endColumn="70"
+            endOffset="1185"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.navigation:navigation-ui-ktx than 2.7.7 is available: 2.9.7">
+        <fix-replace
+            description="Change to 2.9.7"
+            family="Update versions"
+            oldString="2.7.7"
+            replacement="2.9.7"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="46"
+            column="21"
+            startOffset="1208"
+            endLine="46"
+            endColumn="64"
+            endOffset="1251"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.7.0 is available: 2.10.0">
+        <fix-replace
+            description="Change to 2.10.0"
+            family="Update versions"
+            oldString="2.7.0"
+            replacement="2.10.0"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="49"
+            column="21"
+            startOffset="1305"
+            endLine="49"
+            endColumn="69"
+            endOffset="1353"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.lifecycle:lifecycle-livedata-ktx than 2.7.0 is available: 2.10.0">
+        <fix-replace
+            description="Change to 2.10.0"
+            family="Update versions"
+            oldString="2.7.0"
+            replacement="2.10.0"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="50"
+            column="21"
+            startOffset="1376"
+            endLine="50"
+            endColumn="68"
+            endOffset="1423"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.security:security-crypto than 1.1.0-alpha06 is available: 1.1.0">
+        <fix-replace
+            description="Change to 1.1.0"
+            family="Update versions"
+            oldString="1.1.0-alpha06"
+            replacement="1.1.0"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="58"
+            column="21"
+            startOffset="1725"
+            endLine="58"
+            endColumn="68"
+            endOffset="1772"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.3.0">
+        <fix-replace
+            description="Change to 1.3.0"
+            family="Update versions"
+            oldString="1.1.5"
+            replacement="1.3.0"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="67"
+            column="32"
+            startOffset="2041"
+            endLine="67"
+            endColumn="61"
+            endOffset="2070"/>
+    </incident>
+
+    <incident
+        id="GradleDependency"
+        severity="warning"
+        message="A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.7.0">
+        <fix-replace
+            description="Change to 3.7.0"
+            family="Update versions"
+            oldString="3.5.1"
+            replacement="3.7.0"/>
+        <location
+            file="${:app*projectDir}/build.gradle.kts"
+            line="68"
+            column="32"
+            startOffset="2104"
+            endLine="68"
+            endColumn="74"
+            endOffset="2146"/>
+    </incident>
+
+</incidents>
