@@ -177,7 +177,17 @@ const Dashboard = () => {
                 reminders = remindersResponse.data || [];
                 setDueSoonReminders(reminders);
             } catch (err) {
-                setDueSoonReminders([]);
+                const localReminders = JSON.parse(localStorage.getItem('annimemo_reminders') || '[]');
+                const now = new Date();
+                const limit = new Date();
+                limit.setDate(now.getDate() + (settings.reminderWindowDays || 7));
+                
+                const filtered = localReminders.filter(r => {
+                    if (r.completed) return false;
+                    const due = new Date(r.dueDate);
+                    return due >= new Date(now.toDateString()) && due <= limit;
+                });
+                setDueSoonReminders(filtered);
             }
 
             // 5. Load or Create Checklist
@@ -707,8 +717,15 @@ const Dashboard = () => {
                         <button onClick={() => navigate('/dashboard')} style={styles.sidebarButton}>🏠 Dashboard</button>
                         <button onClick={() => navigate('/pets')} style={styles.sidebarButton}>🐾 My Pets</button>
                         <button onClick={() => navigate('/reminders')} style={styles.sidebarButton}>⏰ Reminders</button>
-                        <button onClick={() => navigate('/appointments')} style={styles.sidebarButton}>🗓️ Appointments</button>
-                        <button onClick={() => navigate('/health-trends')} style={styles.sidebarButton}>📈 Health Trends</button>
+                        <button onClick={() => navigate('/reminders')} style={styles.sidebarButton}>🗓️ Appointments</button>
+                        <button onClick={() => {
+                            const localPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+                            if (localPets.length > 0) {
+                                navigate(`/pets/${localPets[0].id}/health`);
+                            } else {
+                                navigate('/pets');
+                            }
+                        }} style={styles.sidebarButton}>📈 Health Trends</button>
                         <button onClick={() => navigate('/facts')} style={styles.sidebarButton}>📚 Pet Facts</button>
                         <button onClick={() => navigate('/settings')} style={styles.sidebarButton}>⚙️ Settings</button>
                     </aside>
@@ -856,12 +873,19 @@ const Dashboard = () => {
                             <div style={styles.actionTitle}>My Pets</div>
                             <div style={styles.actionSubtitle}>{pets.length} pet{pets.length !== 1 ? 's' : ''}</div>
                         </button>
-                        <button onClick={() => navigate('/health-trends')} style={styles.actionCard}>
+                        <button onClick={() => {
+                            const localPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+                            if (localPets.length > 0) {
+                                navigate(`/pets/${localPets[0].id}/health`);
+                            } else {
+                                navigate('/pets');
+                            }
+                        }} style={styles.actionCard}>
                             <div style={styles.actionIcon}>📊</div>
                             <div style={styles.actionTitle}>Health Trends</div>
                             <div style={styles.actionSubtitle}>View progress over time</div>
                         </button>
-                        <button onClick={() => navigate('/breeds')} style={styles.actionCard}>
+                        <button onClick={() => navigate('/facts')} style={styles.actionCard}>
                             <div style={styles.actionIcon}>🔍</div>
                             <div style={styles.actionTitle}>Explore Breeds</div>
                             <div style={styles.actionSubtitle}>Dog & Cat breeds</div>
@@ -871,7 +895,7 @@ const Dashboard = () => {
                             <div style={styles.actionTitle}>Reminders</div>
                             <div style={styles.actionSubtitle}>Upcoming care tasks</div>
                         </button>
-                        <button onClick={() => navigate('/appointments')} style={styles.actionCard}>
+                        <button onClick={() => navigate('/reminders')} style={styles.actionCard}>
                             <div style={styles.actionIcon}>🗓️</div>
                             <div style={styles.actionTitle}>Appointments</div>
                             <div style={styles.actionSubtitle}>Track vet visits</div>

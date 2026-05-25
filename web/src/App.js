@@ -36,6 +36,11 @@ function App() {
         <Route path="/pets/edit/:id" element={<EditPet />} />
         <Route path="/pets/:id/health" element={<HealthMetrics />} />
         
+        {/* Redirect Fallbacks for Unmapped Features */}
+        <Route path="/appointments" element={<Navigate to="/reminders" replace />} />
+        <Route path="/health-trends" element={<Navigate to="/pets" replace />} />
+        <Route path="/breeds" element={<Navigate to="/facts" replace />} />
+        
         {/* Footer Link Routes */}
         <Route path="/reminders" element={<RemindersPage />} />
         <Route path="/facts" element={<PetFactsPage />} />
