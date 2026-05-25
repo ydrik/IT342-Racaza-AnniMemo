@@ -44,8 +44,8 @@ const Dashboard = () => {
     const [dueSoonReminders, setDueSoonReminders] = useState([]);
     const [factOfDay, setFactOfDay] = useState(null);
     const [activityStreak, setActivityStreak] = useState(0);
-    const [careScore, setCareScore] = useState(0);
     const [todayChecklist, setTodayChecklist] = useState([]);
+    const [newChecklistItemText, setNewChecklistItemText] = useState('');
     const [commandQuery, setCommandQuery] = useState('');
     const [dashboardSettings, setDashboardSettings] = useState({
         reminderWindowDays: 7,
@@ -100,133 +100,100 @@ const Dashboard = () => {
     };
 
     const fetchDashboardData = async () => {
+        setIsLoading(true);
         try {
             const token = localStorage.getItem('token');
             const settings = getDashboardSettings();
             setDashboardSettings(settings);
-            
-            // Fetch user profile
-            const userResponse = await axios.get('http://localhost:8080/api/users/profile', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setUser(userResponse.data);
 
-            // FRS Requirement: Display Dashboard summarizing recent pet activities
-            // Fetch pets
-            const petsResponse = await axios.get('http://localhost:8080/api/pets', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const petsData = petsResponse.data;
-            setPets(petsData);
+            // Decode username from token to act as fallback
+            let decodedUsername = 'User';
+            if (token) {
+                try {
+                    const decoded = atob(token);
+                    const parts = decoded.split(':');
+                    if (parts[0]) {
+                        decodedUsername = parts[0];
+                    }
+                } catch (e) {
+                    // Ignore token decode error
+                }
+            }
 
-            // Fetch recent activities
-            const activitiesResponse = await axios.get('http://localhost:8080/api/activities/recent', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const metricActivities = mapMetricsToActivities(activitiesResponse.data);
-            const petActivities = mapPetsToActivities(petsData);
-            const localActivities = mapLocalActivities(ActivityService.getActivities());
-            const mergedActivities = sortActivitiesByDate([...metricActivities, ...petActivities, ...localActivities]);
-            setRecentActivities(mergedActivities);
-            setActivityStreak(calculateActivityStreak(mergedActivities));
+            // 1. Fetch user profile
+            try {
+                const userResponse = await axios.get('http://localhost:8080/api/users/profile', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUser(userResponse.data);
+            } catch (err) {
+                // Fallback to decoded username instead of hardcoded 'johndoe' / 'John'
+                setUser({
+                    username: decodedUsername,
+                    firstName: decodedUsername,
+                    lastName: '',
+                    email: `${decodedUsername}@example.com`
+                });
+            }
 
-            // Fetch due-soon reminders to drive daily action urgency.
+            // 2. Fetch pets
+            let petsData = [];
+            try {
+                const petsResponse = await axios.get('http://localhost:8080/api/pets', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                petsData = petsResponse.data || [];
+                setPets(petsData);
+            } catch (err) {
+                setPets([]);
+            }
+
+            // 3. Fetch recent activities
+            let mergedActivities = [];
+            try {
+                const activitiesResponse = await axios.get('http://localhost:8080/api/activities/recent', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const metricActivities = mapMetricsToActivities(activitiesResponse.data);
+                const petActivities = mapPetsToActivities(petsData);
+                const localActivities = mapLocalActivities(ActivityService.getActivities());
+                mergedActivities = sortActivitiesByDate([...metricActivities, ...petActivities, ...localActivities]);
+                setRecentActivities(mergedActivities);
+                setActivityStreak(calculateActivityStreak(mergedActivities));
+            } catch (err) {
+                const localActivities = mapLocalActivities(ActivityService.getActivities());
+                mergedActivities = sortActivitiesByDate(localActivities);
+                setRecentActivities(mergedActivities);
+                setActivityStreak(calculateActivityStreak(mergedActivities));
+            }
+
+            // 4. Fetch due-soon reminders
+            let reminders = [];
             try {
                 const remindersResponse = await axios.get(`http://localhost:8080/api/reminders/due-soon?days=${settings.reminderWindowDays}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                const reminders = remindersResponse.data || [];
+                reminders = remindersResponse.data || [];
                 setDueSoonReminders(reminders);
-                setCareScore(calculateCareScore(petsData.length, mergedActivities.length, reminders.length));
-                setTodayChecklist(loadOrCreateChecklist(petsData, mergedActivities, reminders));
-            } catch (reminderErr) {
+            } catch (err) {
                 setDueSoonReminders([]);
-                setCareScore(calculateCareScore(petsData.length, mergedActivities.length, 0));
-                setTodayChecklist(loadOrCreateChecklist(petsData, mergedActivities, []));
             }
 
-            await loadFactOfTheDay(token, settings.defaultFactSpecies);
+            // 5. Load or Create Checklist
+            setTodayChecklist(loadOrCreateChecklist(petsData, mergedActivities, reminders));
+
+            // 6. Fetch fact of the day
+            try {
+                await loadFactOfTheDay(token, settings.defaultFactSpecies);
+            } catch (err) {
+                setFactOfDay({
+                    species: 'pet',
+                    fact: 'Pets thrive with predictable routines, especially around feeding, exercise, and sleep.',
+                    source: 'Dashboard fallback'
+                });
+            }
         } catch (err) {
-            // Mock data for frontend-only mode
-            setUser({ 
-                username: 'johndoe',
-                firstName: 'John',
-                lastName: 'Doe',
-                email: 'john.doe@example.com' 
-            });
-
-            const mockPets = [
-                {
-                    id: 1,
-                    name: 'Max',
-                    species: 'Dog',
-                    breed: 'Golden Retriever',
-                    weight: 30.5,
-                    color: 'Golden'
-                },
-                {
-                    id: 2,
-                    name: 'Luna',
-                    species: 'Cat',
-                    breed: 'Persian',
-                    weight: 4.2,
-                    color: 'White'
-                }
-            ];
-            setPets(mockPets);
-
-            const mockActivities = [
-                {
-                    id: 1,
-                    type: 'vaccination',
-                    petName: 'Max',
-                    description: 'Rabies Vaccine',
-                    timestamp: '2026-02-10T09:12:00',
-                    icon: '💉'
-                },
-                {
-                    id: 2,
-                    type: 'weight',
-                    petName: 'Luna',
-                    description: 'Weight recorded: 4.2 kg',
-                    timestamp: '2026-02-09T14:30:00',
-                    icon: '📊'
-                },
-                {
-                    id: 3,
-                    type: 'medication',
-                    petName: 'Max',
-                    description: 'Started Antibiotics',
-                    timestamp: '2026-02-08T08:05:00',
-                    icon: '💊'
-                },
-                {
-                    id: 4,
-                    type: 'vetVisit',
-                    petName: 'Max',
-                    description: 'Routine checkup',
-                    timestamp: '2026-02-05T15:20:00',
-                    icon: '🏥'
-                }
-            ];
-            const localActivities = mapLocalActivities(ActivityService.getActivities());
-            const mergedActivities = sortActivitiesByDate([...mockActivities, ...localActivities]);
-            setRecentActivities(mergedActivities);
-            setActivityStreak(calculateActivityStreak(mergedActivities));
-            setDueSoonReminders([
-                { id: 1, title: 'Deworming schedule', dueDate: '2026-03-12', petName: 'Max' },
-                { id: 2, title: 'Annual vaccine check', dueDate: '2026-03-14', petName: 'Luna' }
-            ]);
-            setCareScore(calculateCareScore(mockPets.length, mergedActivities.length, 2));
-            setTodayChecklist(loadOrCreateChecklist(mockPets, mergedActivities, [
-                { id: 1, title: 'Deworming schedule', dueDate: '2026-03-12', petName: 'Max' },
-                { id: 2, title: 'Annual vaccine check', dueDate: '2026-03-14', petName: 'Luna' }
-            ]));
-            setFactOfDay({
-                species: 'pet',
-                fact: 'Pets thrive with predictable routines, especially around feeding, exercise, and sleep.',
-                source: 'Dashboard fallback'
-            });
+            console.error("Error loading dashboard details: ", err);
         } finally {
             setIsLoading(false);
         }
@@ -292,49 +259,19 @@ const Dashboard = () => {
         return streak;
     };
 
-    const calculateCareScore = (petCount, activityCount, reminderCount) => {
-        let score = 40;
-        score += Math.min(petCount * 8, 24);
-        score += Math.min(activityCount * 4, 24);
-        if (reminderCount === 0) {
-            score += 12;
-        } else {
-            score -= Math.min(reminderCount * 6, 24);
+    const calculateCareScore = (petCount, activityCount, reminderCount, checklistItems = []) => {
+        if (!checklistItems || checklistItems.length === 0) {
+            return 0;
         }
-        return Math.max(10, Math.min(100, score));
+
+        const completedCount = checklistItems.filter(item => item.done).length;
+        return Math.round((completedCount / checklistItems.length) * 100);
     };
 
     const getChecklistStorageKey = () => `annimemo_checklist_${getFactDateKey()}`;
 
     const createChecklistTemplate = (petsData, activities, reminders) => {
-        const hasPets = (petsData || []).length > 0;
-        const hasRecentActivity = (activities || []).length > 0;
-        const hasReminderDueSoon = (reminders || []).length > 0;
-
-        return [
-            {
-                id: 'review-reminders',
-                label: hasReminderDueSoon
-                    ? `Review ${Math.min(reminders.length, 3)} due reminder${reminders.length > 1 ? 's' : ''}`
-                    : 'Check reminder board',
-                done: false
-            },
-            {
-                id: 'log-health',
-                label: hasPets ? 'Log one health update for a pet' : 'Add your first pet profile',
-                done: false
-            },
-            {
-                id: 'learn-fact',
-                label: 'Read today\'s pet fact and share it',
-                done: false
-            },
-            {
-                id: 'review-activity',
-                label: hasRecentActivity ? 'Review your latest activity timeline' : 'Create your first activity today',
-                done: false
-            }
-        ];
+        return [];
     };
 
     const loadOrCreateChecklist = (petsData, activities, reminders) => {
@@ -361,6 +298,29 @@ const Dashboard = () => {
         const updated = todayChecklist.map((item) =>
             item.id === id ? { ...item, done: !item.done } : item
         );
+        setTodayChecklist(updated);
+        localStorage.setItem(getChecklistStorageKey(), JSON.stringify(updated));
+    };
+
+    const handleAddChecklistItem = (e) => {
+        e.preventDefault();
+        const trimmed = newChecklistItemText.trim();
+        if (!trimmed) {
+            return;
+        }
+        const newItem = {
+            id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            label: trimmed,
+            done: false
+        };
+        const updated = [...todayChecklist, newItem];
+        setTodayChecklist(updated);
+        localStorage.setItem(getChecklistStorageKey(), JSON.stringify(updated));
+        setNewChecklistItemText('');
+    };
+
+    const deleteChecklistItem = (id) => {
+        const updated = todayChecklist.filter((item) => item.id !== id);
         setTodayChecklist(updated);
         localStorage.setItem(getChecklistStorageKey(), JSON.stringify(updated));
     };
@@ -575,6 +535,8 @@ const Dashboard = () => {
             .slice(0, 8);
     };
 
+    const careScore = calculateCareScore(pets.length, recentActivities.length, dueSoonReminders.length, todayChecklist);
+
     if (isLoading) {
         return (
             <div style={styles.loadingContainer}>
@@ -699,17 +661,51 @@ const Dashboard = () => {
                     <div style={styles.checklistProgressBar}>
                         <div style={{ ...styles.checklistProgressFill, width: `${checklistCompletion}%` }}></div>
                     </div>
+                    
+                    <form onSubmit={handleAddChecklistItem} style={styles.checklistForm}>
+                        <input
+                            value={newChecklistItemText}
+                            onChange={(e) => setNewChecklistItemText(e.target.value)}
+                            placeholder="Add a new checklist task..."
+                            style={styles.checklistInput}
+                            aria-label="New checklist item"
+                        />
+                        <button type="submit" style={styles.checklistAddButton}>Add</button>
+                    </form>
+
                     <div style={styles.checklistItems}>
-                        {todayChecklist.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => toggleChecklistItem(item.id)}
-                                style={item.done ? { ...styles.checklistItem, ...styles.checklistItemDone } : styles.checklistItem}
-                            >
-                                <span style={styles.checklistBullet}>{item.done ? '✅' : '⬜'}</span>
-                                <span style={styles.checklistText}>{item.label}</span>
-                            </button>
-                        ))}
+                        {todayChecklist.length === 0 ? (
+                            <p style={styles.checklistEmptyText}>No checklist tasks for today. Add one above! ✨</p>
+                        ) : (
+                            todayChecklist.map((item) => (
+                                <div
+                                    key={item.id}
+                                    style={item.done ? { ...styles.checklistItem, ...styles.checklistItemDone } : styles.checklistItem}
+                                >
+                                    <button
+                                        onClick={() => toggleChecklistItem(item.id)}
+                                        style={styles.checklistToggleBtn}
+                                        aria-label={item.done ? "Mark incomplete" : "Mark complete"}
+                                    >
+                                        <span style={styles.checklistBullet}>{item.done ? '✅' : '⬜'}</span>
+                                        <span style={{
+                                            ...styles.checklistText,
+                                            textDecoration: item.done ? 'line-through' : 'none',
+                                            opacity: item.done ? 0.7 : 1
+                                        }}>
+                                            {item.label}
+                                        </span>
+                                    </button>
+                                    <button
+                                        onClick={() => deleteChecklistItem(item.id)}
+                                        style={styles.checklistDeleteBtn}
+                                        aria-label="Delete item"
+                                    >
+                                        🗑️
+                                    </button>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
 
@@ -1500,11 +1496,10 @@ const styles = {
         borderRadius: '10px',
         background: 'var(--app-bg)',
         color: 'var(--text-primary)',
-        textAlign: 'left',
         padding: '10px 12px',
-        cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'space-between',
         gap: '10px'
     },
     checklistItemDone: {
@@ -1517,6 +1512,66 @@ const styles = {
     checklistText: {
         fontSize: '14px',
         lineHeight: 1.4
+    },
+    checklistForm: {
+        display: 'flex',
+        gap: '8px',
+        marginBottom: '14px'
+    },
+    checklistInput: {
+        flex: 1,
+        border: '1px solid var(--card-border)',
+        borderRadius: '10px',
+        padding: '10px 12px',
+        background: 'var(--app-bg)',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        outline: 'none',
+        transition: 'border-color 0.2s'
+    },
+    checklistAddButton: {
+        border: 'none',
+        borderRadius: '10px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontWeight: '600',
+        padding: '0 16px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+        transition: 'all 0.2s'
+    },
+    checklistToggleBtn: {
+        border: 'none',
+        background: 'transparent',
+        color: 'inherit',
+        textAlign: 'left',
+        padding: 0,
+        margin: 0,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        flex: 1
+    },
+    checklistDeleteBtn: {
+        border: 'none',
+        background: 'transparent',
+        cursor: 'pointer',
+        fontSize: '14px',
+        padding: '4px 8px',
+        borderRadius: '6px',
+        transition: 'background 0.2s',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    checklistEmptyText: {
+        color: 'var(--text-muted)',
+        fontSize: '14px',
+        textAlign: 'center',
+        margin: '16px 0',
+        fontStyle: 'italic'
     },
     quickActions: {
         marginBottom: '10px',
