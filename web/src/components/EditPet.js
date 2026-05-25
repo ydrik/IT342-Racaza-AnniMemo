@@ -46,6 +46,7 @@ const EditPet = () => {
         }
 
         fetchPetData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, navigate]);
 
     const fetchPetData = async () => {
@@ -61,21 +62,19 @@ const EditPet = () => {
                 setImagePreview(response.data.imageUrl || null);
             }
         } catch (err) {
-            // For now, use mock data
-            const mockPet = {
-                id: id,
-                name: 'Max',
-                species: 'Dog',
-                breed: 'Golden Retriever',
-                dateOfBirth: '2020-05-15',
-                gender: 'Male',
-                weight: '30.5',
-                color: 'Golden',
-                imageUrl: '',
-                notes: 'Loves to play fetch'
-            };
-            setPetData(mockPet);
-            setImagePreview(mockPet.imageUrl || null);
+            // Load from localStorage fallback
+            const existingPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+            const foundPet = existingPets.find(p => String(p.id) === String(id));
+            if (foundPet) {
+                setPetData(foundPet);
+                setImagePreview(foundPet.imageUrl || null);
+            } else {
+                setMessage('Pet profile not found in local storage.');
+                setMessageType('error');
+                setTimeout(() => {
+                    navigate('/pets');
+                }, 2000);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -119,6 +118,27 @@ const EditPet = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
+
+        // Date of Birth validation
+        const dob = petData.dateOfBirth;
+        if (dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            const minDate = new Date();
+            minDate.setFullYear(today.getFullYear() - 35); // Realistic max pet age is 35 years
+
+            if (birthDate > today) {
+                setMessage('Date of Birth cannot be in the future.');
+                setMessageType('error');
+                return;
+            }
+            if (birthDate < minDate) {
+                setMessage('Please enter a realistic Date of Birth (maximum 35 years ago).');
+                setMessageType('error');
+                return;
+            }
+        }
+
         setIsSaving(true);
 
         try {
@@ -143,7 +163,16 @@ const EditPet = () => {
                 }, 1500);
             }
         } catch (err) {
-            // For now, simulate success
+            // Update in localStorage fallback
+            const existingPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+            const updatedPets = existingPets.map(p => {
+                if (String(p.id) === String(id)) {
+                    return { ...p, ...petData };
+                }
+                return p;
+            });
+            localStorage.setItem('annimemo_pets', JSON.stringify(updatedPets));
+
             setMessage('Pet profile updated successfully! (Frontend only - backend pending)');
             setMessageType('success');
             ActivityService.logActivity({
@@ -266,6 +295,9 @@ const EditPet = () => {
                                         name="dateOfBirth"
                                         value={petData.dateOfBirth}
                                         onChange={handleChange}
+                                        min="1990-01-01"
+                                        max={new Date().toISOString().split('T')[0]}
+                                        onKeyDown={(e) => e.preventDefault()}
                                         style={styles.input}
                                     />
                                 </div>
@@ -309,14 +341,33 @@ const EditPet = () => {
 
                                 <div style={styles.inputGroup}>
                                     <label style={styles.label}>Color</label>
-                                    <input
-                                        type="text"
+                                    <select
                                         name="color"
                                         value={petData.color}
                                         onChange={handleChange}
-                                        placeholder="e.g., Brown, White, Black"
-                                        style={styles.input}
-                                    />
+                                        style={styles.select}
+                                    >
+                                        <option value="">Select color</option>
+                                        <option value="Black">Black</option>
+                                        <option value="White">White</option>
+                                        <option value="Brown">Brown</option>
+                                        <option value="Golden">Golden</option>
+                                        <option value="Yellow">Yellow</option>
+                                        <option value="Cream">Cream</option>
+                                        <option value="Grey">Grey</option>
+                                        <option value="Orange">Orange</option>
+                                        <option value="Red">Red</option>
+                                        <option value="Blue">Blue</option>
+                                        <option value="Green">Green</option>
+                                        <option value="Silver">Silver</option>
+                                        <option value="Fawn">Fawn</option>
+                                        <option value="Brindle">Brindle</option>
+                                        <option value="Calico">Calico</option>
+                                        <option value="Tuxedo">Tuxedo</option>
+                                        <option value="Tortoiseshell">Tortoiseshell</option>
+                                        <option value="Multicolor">Multicolor</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

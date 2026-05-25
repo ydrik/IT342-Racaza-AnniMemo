@@ -51,6 +51,7 @@ const HealthMetrics = () => {
         }
 
         fetchPetAndHealthData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, navigate]);
 
     const fetchPetAndHealthData = async () => {
@@ -69,8 +70,15 @@ const HealthMetrics = () => {
             });
             setHealthRecords(mapHealthRecords(healthResponse.data));
         } catch (err) {
-            // Mock data
-            setPetName('Max');
+            // Retrieve pet name from localStorage fallback if available
+            const existingPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+            const foundPet = existingPets.find(p => String(p.id) === String(id));
+            if (foundPet) {
+                setPetName(foundPet.name);
+            } else {
+                setPetName('Max');
+            }
+            
             const mockHealthRecords = [
                 {
                     id: 1,
@@ -159,6 +167,8 @@ const HealthMetrics = () => {
                     treatment: formData.visitTreatment,
                     notes: formData.visitNotes
                 };
+                break;
+            default:
                 break;
         }
 

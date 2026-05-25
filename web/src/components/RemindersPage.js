@@ -63,32 +63,38 @@ const RemindersPage = () => {
 
     const fetchData = async () => {
         setIsLoading(true);
+        const token = localStorage.getItem('token');
+        
+        let petsData = [];
         try {
-            const token = localStorage.getItem('token');
-            const [petsResponse, remindersResponse] = await Promise.all([
-                axios.get('http://localhost:8080/api/pets', {
-                    headers: { Authorization: `Bearer ${token}` }
-                }),
-                axios.get('http://localhost:8080/api/reminders', {
-                    headers: { Authorization: `Bearer ${token}` }
-                })
-            ]);
-
-            setPets(petsResponse.data || []);
-            setReminders(remindersResponse.data || []);
-
-            if ((petsResponse.data || []).length > 0) {
-                setForm((prev) => ({
-                    ...prev,
-                    petId: prev.petId || String(petsResponse.data[0].id)
-                }));
-            }
-        } catch (error) {
-            setMessage('Failed to load reminders. Check backend connection.');
-            setMessageType('error');
-        } finally {
-            setIsLoading(false);
+            const petsResponse = await axios.get('http://localhost:8080/api/pets', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            petsData = petsResponse.data || [];
+        } catch (err) {
+            petsData = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
         }
+        setPets(petsData);
+
+        let remindersData = [];
+        try {
+            const remindersResponse = await axios.get('http://localhost:8080/api/reminders', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            remindersData = remindersResponse.data || [];
+        } catch (err) {
+            // Reminders fallback
+            remindersData = [];
+        }
+        setReminders(remindersData);
+
+        if (petsData.length > 0) {
+            setForm((prev) => ({
+                ...prev,
+                petId: prev.petId || String(petsData[0].id)
+            }));
+        }
+        setIsLoading(false);
     };
 
     const handleChange = (event) => {

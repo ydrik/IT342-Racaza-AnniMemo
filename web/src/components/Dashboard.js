@@ -145,7 +145,8 @@ const Dashboard = () => {
                 petsData = petsResponse.data || [];
                 setPets(petsData);
             } catch (err) {
-                setPets([]);
+                petsData = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+                setPets(petsData);
             }
 
             // 3. Fetch recent activities
