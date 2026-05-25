@@ -4,12 +4,62 @@ import axios from 'axios';
 import LogoutModal from './LogoutModal';
 import ActivityService from '../services/activity.service';
 
+const CALENDAR_WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function toLocalDateKey(dateInput) {
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+function buildCalendarCells(anchorMonth) {
+    const year = anchorMonth.getFullYear();
+    const month = anchorMonth.getMonth();
+    const firstOfMonth = new Date(year, month, 1);
+    const startOffset = firstOfMonth.getDay();
+    const gridStart = new Date(year, month, 1 - startOffset);
+
+    const cells = [];
+    for (let i = 0; i < 42; i += 1) {
+        const cellDate = new Date(gridStart);
+        cellDate.setDate(gridStart.getDate() + i);
+        cells.push({
+            key: toLocalDateKey(cellDate),
+            label: cellDate.getDate(),
+            inCurrentMonth: cellDate.getMonth() === month
+        });
+    }
+    return cells;
+}
+
 const Dashboard = () => {
     const [user, setUser] = useState(null);
     const [pets, setPets] = useState([]);
     const [recentActivities, setRecentActivities] = useState([]);
+    const [dueSoonReminders, setDueSoonReminders] = useState([]);
+    const [factOfDay, setFactOfDay] = useState(null);
+    const [activityStreak, setActivityStreak] = useState(0);
+    const [careScore, setCareScore] = useState(0);
+    const [todayChecklist, setTodayChecklist] = useState([]);
+    const [commandQuery, setCommandQuery] = useState('');
+    const [dashboardSettings, setDashboardSettings] = useState({
+        reminderWindowDays: 7,
+        defaultFactSpecies: 'any',
+        compactDashboard: false
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440);
+    const [calendarMonth, setCalendarMonth] = useState(() => {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), 1);
+    });
+    const [selectedCalendarDate, setSelectedCalendarDate] = useState(() => toLocalDateKey(new Date()));
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,13 +69,41 @@ const Dashboard = () => {
             // Activity Diagram: If not authenticated, redirect to Login
             navigate('/login'); 
         } else {
+            setDashboardSettings(getDashboardSettings());
             fetchDashboardData();
         }
+    // Intentional one-time auth/bootstrap check for this route.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate]);
+
+    useEffect(() => {
+        const onResize = () => setViewportWidth(window.innerWidth);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    const getDashboardSettings = () => {
+        try {
+            const raw = localStorage.getItem('annimemo_settings');
+            if (!raw) {
+                return { reminderWindowDays: 7, defaultFactSpecies: 'any', compactDashboard: false };
+            }
+            const parsed = JSON.parse(raw);
+            return {
+                reminderWindowDays: Number(parsed.reminderWindowDays || 7),
+                defaultFactSpecies: parsed.defaultFactSpecies || 'any',
+                compactDashboard: Boolean(parsed.compactDashboard)
+            };
+        } catch {
+            return { reminderWindowDays: 7, defaultFactSpecies: 'any', compactDashboard: false };
+        }
+    };
 
     const fetchDashboardData = async () => {
         try {
             const token = localStorage.getItem('token');
+            const settings = getDashboardSettings();
+            setDashboardSettings(settings);
             
             // Fetch user profile
             const userResponse = await axios.get('http://localhost:8080/api/users/profile', {
@@ -48,7 +126,26 @@ const Dashboard = () => {
             const metricActivities = mapMetricsToActivities(activitiesResponse.data);
             const petActivities = mapPetsToActivities(petsData);
             const localActivities = mapLocalActivities(ActivityService.getActivities());
-            setRecentActivities(sortActivitiesByDate([...metricActivities, ...petActivities, ...localActivities]));
+            const mergedActivities = sortActivitiesByDate([...metricActivities, ...petActivities, ...localActivities]);
+            setRecentActivities(mergedActivities);
+            setActivityStreak(calculateActivityStreak(mergedActivities));
+
+            // Fetch due-soon reminders to drive daily action urgency.
+            try {
+                const remindersResponse = await axios.get(`http://localhost:8080/api/reminders/due-soon?days=${settings.reminderWindowDays}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const reminders = remindersResponse.data || [];
+                setDueSoonReminders(reminders);
+                setCareScore(calculateCareScore(petsData.length, mergedActivities.length, reminders.length));
+                setTodayChecklist(loadOrCreateChecklist(petsData, mergedActivities, reminders));
+            } catch (reminderErr) {
+                setDueSoonReminders([]);
+                setCareScore(calculateCareScore(petsData.length, mergedActivities.length, 0));
+                setTodayChecklist(loadOrCreateChecklist(petsData, mergedActivities, []));
+            }
+
+            await loadFactOfTheDay(token, settings.defaultFactSpecies);
         } catch (err) {
             // Mock data for frontend-only mode
             setUser({ 
@@ -113,11 +210,228 @@ const Dashboard = () => {
                 }
             ];
             const localActivities = mapLocalActivities(ActivityService.getActivities());
-            setRecentActivities(sortActivitiesByDate([...mockActivities, ...localActivities]));
+            const mergedActivities = sortActivitiesByDate([...mockActivities, ...localActivities]);
+            setRecentActivities(mergedActivities);
+            setActivityStreak(calculateActivityStreak(mergedActivities));
+            setDueSoonReminders([
+                { id: 1, title: 'Deworming schedule', dueDate: '2026-03-12', petName: 'Max' },
+                { id: 2, title: 'Annual vaccine check', dueDate: '2026-03-14', petName: 'Luna' }
+            ]);
+            setCareScore(calculateCareScore(mockPets.length, mergedActivities.length, 2));
+            setTodayChecklist(loadOrCreateChecklist(mockPets, mergedActivities, [
+                { id: 1, title: 'Deworming schedule', dueDate: '2026-03-12', petName: 'Max' },
+                { id: 2, title: 'Annual vaccine check', dueDate: '2026-03-14', petName: 'Luna' }
+            ]));
+            setFactOfDay({
+                species: 'pet',
+                fact: 'Pets thrive with predictable routines, especially around feeding, exercise, and sleep.',
+                source: 'Dashboard fallback'
+            });
         } finally {
             setIsLoading(false);
         }
     };
+
+    const getFactDateKey = () => {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
+    const loadFactOfTheDay = async (token, species) => {
+        const dayKey = getFactDateKey();
+        const factSpecies = species || 'any';
+        const storageKey = `annimemo_fact_of_day_${dayKey}_${factSpecies}`;
+        const cached = localStorage.getItem(storageKey);
+        if (cached) {
+            try {
+                setFactOfDay(JSON.parse(cached));
+                return;
+            } catch {
+                // ignore parsing issue and fetch fresh
+            }
+        }
+
+        const factResponse = await axios.get(`http://localhost:8080/api/facts/random?species=${factSpecies}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const payload = factResponse.data;
+        setFactOfDay(payload);
+        localStorage.setItem(storageKey, JSON.stringify(payload));
+    };
+
+    const calculateActivityStreak = (activities) => {
+        if (!activities.length) {
+            return 0;
+        }
+
+        const uniqueDays = new Set(
+            activities
+                .map((activity) => {
+                    const date = new Date(activity.timestamp || 0);
+                    if (Number.isNaN(date.getTime())) {
+                        return null;
+                    }
+                    return date.toISOString().split('T')[0];
+                })
+                .filter(Boolean)
+        );
+
+        let streak = 0;
+        const cursor = new Date();
+        while (true) {
+            const key = cursor.toISOString().split('T')[0];
+            if (!uniqueDays.has(key)) {
+                break;
+            }
+            streak += 1;
+            cursor.setDate(cursor.getDate() - 1);
+        }
+        return streak;
+    };
+
+    const calculateCareScore = (petCount, activityCount, reminderCount) => {
+        let score = 40;
+        score += Math.min(petCount * 8, 24);
+        score += Math.min(activityCount * 4, 24);
+        if (reminderCount === 0) {
+            score += 12;
+        } else {
+            score -= Math.min(reminderCount * 6, 24);
+        }
+        return Math.max(10, Math.min(100, score));
+    };
+
+    const getChecklistStorageKey = () => `annimemo_checklist_${getFactDateKey()}`;
+
+    const createChecklistTemplate = (petsData, activities, reminders) => {
+        const hasPets = (petsData || []).length > 0;
+        const hasRecentActivity = (activities || []).length > 0;
+        const hasReminderDueSoon = (reminders || []).length > 0;
+
+        return [
+            {
+                id: 'review-reminders',
+                label: hasReminderDueSoon
+                    ? `Review ${Math.min(reminders.length, 3)} due reminder${reminders.length > 1 ? 's' : ''}`
+                    : 'Check reminder board',
+                done: false
+            },
+            {
+                id: 'log-health',
+                label: hasPets ? 'Log one health update for a pet' : 'Add your first pet profile',
+                done: false
+            },
+            {
+                id: 'learn-fact',
+                label: 'Read today\'s pet fact and share it',
+                done: false
+            },
+            {
+                id: 'review-activity',
+                label: hasRecentActivity ? 'Review your latest activity timeline' : 'Create your first activity today',
+                done: false
+            }
+        ];
+    };
+
+    const loadOrCreateChecklist = (petsData, activities, reminders) => {
+        const storageKey = getChecklistStorageKey();
+        const cached = localStorage.getItem(storageKey);
+
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    return parsed;
+                }
+            } catch {
+                // Ignore invalid cache and recreate below.
+            }
+        }
+
+        const template = createChecklistTemplate(petsData, activities, reminders);
+        localStorage.setItem(storageKey, JSON.stringify(template));
+        return template;
+    };
+
+    const toggleChecklistItem = (id) => {
+        const updated = todayChecklist.map((item) =>
+            item.id === id ? { ...item, done: !item.done } : item
+        );
+        setTodayChecklist(updated);
+        localStorage.setItem(getChecklistStorageKey(), JSON.stringify(updated));
+    };
+
+    const handleCommandSubmit = (e) => {
+        e.preventDefault();
+        const normalized = commandQuery.trim().toLowerCase();
+        if (!normalized) {
+            return;
+        }
+
+        if (normalized.includes('pet')) {
+            navigate('/pets');
+            return;
+        }
+        if (normalized.includes('reminder') || normalized.includes('task')) {
+            navigate('/reminders');
+            return;
+        }
+        if (normalized.includes('fact')) {
+            navigate('/facts');
+            return;
+        }
+        if (normalized.includes('profile') || normalized.includes('account')) {
+            navigate('/profile');
+            return;
+        }
+        if (normalized.includes('setting') || normalized.includes('preference')) {
+            navigate('/settings');
+            return;
+        }
+
+        setCommandQuery('');
+    };
+
+    const completedChecklistCount = todayChecklist.filter((item) => item.done).length;
+    const checklistCompletion = todayChecklist.length
+        ? Math.round((completedChecklistCount / todayChecklist.length) * 100)
+        : 0;
+
+    const calendarEvents = [
+        ...dueSoonReminders.map((item) => ({
+            id: `reminder-${item.id}`,
+            title: item.title,
+            meta: item.petName,
+            type: 'Reminder',
+            dateKey: toLocalDateKey(item.dueDate)
+        })),
+        ...recentActivities.map((item) => ({
+            id: `activity-${item.id}`,
+            title: item.description,
+            meta: item.petName,
+            type: 'Activity',
+            dateKey: toLocalDateKey(item.timestamp)
+        }))
+    ].filter((item) => item.dateKey);
+
+    const eventsByDate = calendarEvents.reduce((acc, item) => {
+        if (!acc[item.dateKey]) {
+            acc[item.dateKey] = [];
+        }
+        acc[item.dateKey].push(item);
+        return acc;
+    }, {});
+
+    const calendarCells = buildCalendarCells(calendarMonth);
+    const selectedDateEvents = eventsByDate[selectedCalendarDate] || [];
+    const calendarMonthLabel = calendarMonth.toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric'
+    });
 
     const handleLogout = () => {
         setShowLogoutModal(true);
@@ -269,15 +583,44 @@ const Dashboard = () => {
         );
     }
 
+    const isTablet = viewportWidth < 1460;
+    const isMobile = viewportWidth < 1024;
+    const shellStyle = isMobile ? styles.shellGridMobile : isTablet ? styles.shellGridTablet : styles.shellGrid;
+    const navbarContentStyle = isMobile ? styles.navbarContentMobile : styles.navbarContent;
+    const navbarActionsStyle = isMobile ? styles.navbarActionsMobile : styles.navbarActions;
+    const navbarCenterStyle = styles.navbarCenter;
+    const containerStyle = isMobile ? styles.containerMobile : styles.container;
+    const leftSidebarStyle = isMobile ? styles.leftSidebarMobile : styles.leftSidebar;
+    const rightSidebarStyle = isMobile ? styles.rightSidebarMobile : isTablet ? styles.rightSidebarTablet : styles.rightSidebar;
+    const welcomeTitleStyle = isMobile ? styles.welcomeTitleMobile : styles.welcomeTitle;
+    const welcomeSubtitleStyle = isMobile ? styles.welcomeSubtitleMobile : styles.welcomeSubtitle;
+
     return (
         <div style={styles.pageContainer}>
             {/* Header / Navigation Bar */}
             <header style={styles.navbar}>
-                <div style={styles.navbarContent}>
+                <div style={navbarContentStyle}>
                     <div style={styles.navbarBrand}>
                         <h2 style={styles.brandTitle}>🐾 AnniMemo</h2>
                     </div>
-                    <div style={styles.navbarActions}>
+
+                    <div style={navbarCenterStyle}>
+                        <form onSubmit={handleCommandSubmit} style={styles.commandForm}>
+                            <input
+                                value={commandQuery}
+                                onChange={(e) => setCommandQuery(e.target.value)}
+                                placeholder="Quick jump: pets, reminders, facts..."
+                                style={styles.commandInput}
+                                aria-label="Quick command"
+                            />
+                            <button type="submit" style={styles.commandButton}>Go</button>
+                        </form>
+                    </div>
+
+                    <div style={navbarActionsStyle}>
+                        <button onClick={() => navigate('/settings')} style={styles.settingsButton}>
+                            ⚙️ Settings
+                        </button>
                         <button onClick={() => navigate('/profile')} style={styles.profileButton}>
                             👤 Profile
                         </button>
@@ -288,15 +631,86 @@ const Dashboard = () => {
                 </div>
             </header>
 
-            <div style={styles.container}>
+            <div style={containerStyle}>
+                <div style={shellStyle}>
+                    <aside style={leftSidebarStyle}>
+                        <h4 style={styles.sidebarTitle}>Navigation</h4>
+                        <button onClick={() => navigate('/dashboard')} style={styles.sidebarButton}>🏠 Dashboard</button>
+                        <button onClick={() => navigate('/pets')} style={styles.sidebarButton}>🐾 My Pets</button>
+                        <button onClick={() => navigate('/reminders')} style={styles.sidebarButton}>⏰ Reminders</button>
+                        <button onClick={() => navigate('/appointments')} style={styles.sidebarButton}>🗓️ Appointments</button>
+                        <button onClick={() => navigate('/health-trends')} style={styles.sidebarButton}>📈 Health Trends</button>
+                        <button onClick={() => navigate('/facts')} style={styles.sidebarButton}>📚 Pet Facts</button>
+                        <button onClick={() => navigate('/settings')} style={styles.sidebarButton}>⚙️ Settings</button>
+                    </aside>
+
+                    <div style={dashboardSettings.compactDashboard ? styles.mainCanvasCompact : styles.mainCanvas}>
                 {/* Welcome Section */}
                 <div style={styles.welcomeSection}>
-                    <h1 style={styles.welcomeTitle}>
+                    <h1 style={welcomeTitleStyle}>
                         Welcome back, {user?.firstName || user?.name}! 👋
                     </h1>
-                    <p style={styles.welcomeSubtitle}>
+                    <p style={welcomeSubtitleStyle}>
                         Here's what's happening with your pets today
                     </p>
+                    <div style={styles.welcomeMetaRow}>
+                        <span style={styles.welcomeMetaChip}>Pets: {pets.length}</span>
+                        <span style={styles.welcomeMetaChip}>Due Soon: {dueSoonReminders.length}</span>
+                        <span style={styles.welcomeMetaChip}>Streak: {activityStreak}d</span>
+                    </div>
+                </div>
+
+                <div style={styles.hookStrip}>
+                    <div style={styles.hookCard}>
+                        <div style={styles.hookLabel}>Activity Streak</div>
+                        <div style={styles.hookValue}>{activityStreak} day{activityStreak !== 1 ? 's' : ''}</div>
+                        <div style={styles.hookHint}>Keep logging updates daily.</div>
+                    </div>
+                    <div style={styles.hookCard}>
+                        <div style={styles.hookLabel}>Care Score</div>
+                        <div style={styles.hookValue}>{careScore}%</div>
+                        <div style={styles.scoreBar}>
+                            <div style={{ ...styles.scoreFill, width: `${careScore}%` }}></div>
+                        </div>
+                    </div>
+                    <div style={styles.hookCard}>
+                        <div style={styles.hookLabel}>Due in 7 Days</div>
+                        <div style={styles.hookValue}>{dueSoonReminders.length}</div>
+                        <button onClick={() => navigate('/reminders')} style={styles.hookActionButton}>
+                            View reminders
+                        </button>
+                    </div>
+                </div>
+
+                <div style={styles.factCard}>
+                    <div style={styles.factHeader}>
+                        <h3 style={styles.factTitle}>Fact of the Day</h3>
+                        <button onClick={() => navigate('/facts')} style={styles.factMoreButton}>More facts</button>
+                    </div>
+                    <p style={styles.factText}>{factOfDay?.fact || 'Loading your daily pet fact...'}</p>
+                    <p style={styles.factSource}>Source: {factOfDay?.source || 'Fetching source'}</p>
+                </div>
+
+                <div style={styles.checklistCard}>
+                    <div style={styles.checklistHeader}>
+                        <h3 style={styles.checklistTitle}>Today's Checklist</h3>
+                        <div style={styles.checklistProgressLabel}>{completedChecklistCount}/{todayChecklist.length} done</div>
+                    </div>
+                    <div style={styles.checklistProgressBar}>
+                        <div style={{ ...styles.checklistProgressFill, width: `${checklistCompletion}%` }}></div>
+                    </div>
+                    <div style={styles.checklistItems}>
+                        {todayChecklist.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => toggleChecklistItem(item.id)}
+                                style={item.done ? { ...styles.checklistItem, ...styles.checklistItemDone } : styles.checklistItem}
+                            >
+                                <span style={styles.checklistBullet}>{item.done ? '✅' : '⬜'}</span>
+                                <span style={styles.checklistText}>{item.label}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Quick Actions */}
@@ -308,16 +722,44 @@ const Dashboard = () => {
                             <div style={styles.actionTitle}>My Pets</div>
                             <div style={styles.actionSubtitle}>{pets.length} pet{pets.length !== 1 ? 's' : ''}</div>
                         </button>
-                        <button onClick={() => navigate('/dashboard')} style={styles.actionCard}>
+                        <button onClick={() => navigate('/health-trends')} style={styles.actionCard}>
                             <div style={styles.actionIcon}>📊</div>
-                            <div style={styles.actionTitle}>Health Records</div>
-                            <div style={styles.actionSubtitle}>Track wellness</div>
+                            <div style={styles.actionTitle}>Health Trends</div>
+                            <div style={styles.actionSubtitle}>View progress over time</div>
+                        </button>
+                        <button onClick={() => navigate('/breeds')} style={styles.actionCard}>
+                            <div style={styles.actionIcon}>🔍</div>
+                            <div style={styles.actionTitle}>Explore Breeds</div>
+                            <div style={styles.actionSubtitle}>Dog & Cat breeds</div>
+                        </button>
+                        <button onClick={() => navigate('/reminders')} style={styles.actionCard}>
+                            <div style={styles.actionIcon}>⏰</div>
+                            <div style={styles.actionTitle}>Reminders</div>
+                            <div style={styles.actionSubtitle}>Upcoming care tasks</div>
+                        </button>
+                        <button onClick={() => navigate('/appointments')} style={styles.actionCard}>
+                            <div style={styles.actionIcon}>🗓️</div>
+                            <div style={styles.actionTitle}>Appointments</div>
+                            <div style={styles.actionSubtitle}>Track vet visits</div>
+                        </button>
+                        <button onClick={() => navigate('/facts')} style={styles.actionCard}>
+                            <div style={styles.actionIcon}>📚</div>
+                            <div style={styles.actionTitle}>Pet Facts</div>
+                            <div style={styles.actionSubtitle}>Learn something new</div>
                         </button>
                         <button onClick={() => navigate('/profile')} style={styles.actionCard}>
                             <div style={styles.actionIcon}>👤</div>
                             <div style={styles.actionTitle}>My Profile</div>
                             <div style={styles.actionSubtitle}>Account settings</div>
                         </button>
+                        {/* FRS Feature 2: Role-Based UI Restriction */}
+                        {user?.role === 'ADMIN' && (
+                            <button onClick={() => navigate('/admin')} style={{...styles.actionCard, ...styles.adminCard}}>
+                                <div style={styles.actionIcon}>👨‍💼</div>
+                                <div style={styles.actionTitle}>Admin Panel</div>
+                                <div style={styles.actionSubtitle}>Manage users</div>
+                            </button>
+                        )}
                         <button onClick={() => navigate('/pets/add')} style={styles.actionCard}>
                             <div style={styles.actionIcon}>➕</div>
                             <div style={styles.actionTitle}>Add Pet</div>
@@ -403,6 +845,112 @@ const Dashboard = () => {
                         )}
                     </div>
                 </div>
+
+                    </div>
+
+                    <aside style={rightSidebarStyle}>
+                        <div style={styles.sideCard}>
+                            <div style={styles.calendarHeader}>
+                                <h4 style={styles.sideCardTitle}>Calendar</h4>
+                                <button
+                                    onClick={() => {
+                                        const next = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
+                                        setCalendarMonth(next);
+                                    }}
+                                    style={styles.calendarNavButton}
+                                    aria-label="Previous month"
+                                >
+                                    {'<'}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        const next = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
+                                        setCalendarMonth(next);
+                                    }}
+                                    style={styles.calendarNavButton}
+                                    aria-label="Next month"
+                                >
+                                    {'>'}
+                                </button>
+                            </div>
+                            <div style={styles.calendarMonthLabel}>{calendarMonthLabel}</div>
+                            <div style={styles.calendarWeekdays}>
+                                {CALENDAR_WEEKDAYS.map((day) => (
+                                    <div key={day} style={styles.calendarWeekdayCell}>{day}</div>
+                                ))}
+                            </div>
+                            <div style={styles.calendarGrid}>
+                                {calendarCells.map((cell) => {
+                                    const hasEvents = Boolean(eventsByDate[cell.key]?.length);
+                                    const isSelected = cell.key === selectedCalendarDate;
+                                    const cellStyle = isSelected
+                                        ? { ...styles.calendarDayCell, ...styles.calendarDayCellSelected }
+                                        : !cell.inCurrentMonth
+                                            ? { ...styles.calendarDayCell, ...styles.calendarDayCellMuted }
+                                            : styles.calendarDayCell;
+
+                                    return (
+                                        <button
+                                            key={cell.key}
+                                            onClick={() => setSelectedCalendarDate(cell.key)}
+                                            style={cellStyle}
+                                        >
+                                            <span>{cell.label}</span>
+                                            {hasEvents && <span style={styles.calendarEventDot}></span>}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const today = new Date();
+                                    setCalendarMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+                                    setSelectedCalendarDate(toLocalDateKey(today));
+                                }}
+                                style={styles.sideActionButton}
+                            >
+                                Jump to Today
+                            </button>
+                            <div style={styles.calendarAgenda}>
+                                <h5 style={styles.calendarAgendaTitle}>Selected Day Agenda</h5>
+                                {selectedDateEvents.length === 0 ? (
+                                    <p style={styles.sideEmpty}>No events on this day.</p>
+                                ) : (
+                                    <div style={styles.sideList}>
+                                        {selectedDateEvents.slice(0, 5).map((item) => (
+                                            <div key={item.id} style={styles.sideListItem}>
+                                                <div style={styles.sideItemTitle}>{item.title}</div>
+                                                <div style={styles.sideItemMeta}>{item.type} • {item.meta}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div style={styles.sideCard}>
+                            <h4 style={styles.sideCardTitle}>Due Soon</h4>
+                            {dueSoonReminders.length === 0 ? (
+                                <p style={styles.sideEmpty}>Nothing urgent right now.</p>
+                            ) : (
+                                <div style={styles.sideList}>
+                                    {dueSoonReminders.slice(0, 4).map((item) => (
+                                        <div key={item.id} style={styles.sideListItem}>
+                                            <div style={styles.sideItemTitle}>{item.title}</div>
+                                            <div style={styles.sideItemMeta}>{item.petName} • {item.dueDate}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <div style={styles.sideCard}>
+                            <h4 style={styles.sideCardTitle}>Quick Adjustments</h4>
+                            <p style={styles.sideEmpty}>Reminder window: {dashboardSettings.reminderWindowDays} day(s)</p>
+                            <p style={styles.sideEmpty}>Fact species: {dashboardSettings.defaultFactSpecies}</p>
+                            <button onClick={() => navigate('/settings')} style={styles.sideActionButton}>Open Settings</button>
+                        </div>
+                    </aside>
+                </div>
             </div>
 
             <LogoutModal 
@@ -419,7 +967,7 @@ const styles = {
         minHeight: '100vh',
         background: 'var(--app-bg)',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        paddingBottom: '40px'
+        paddingBottom: '72px'
     },
     navbar: {
         backgroundColor: 'var(--card-bg)',
@@ -432,12 +980,26 @@ const styles = {
         boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
     },
     navbarContent: {
-        maxWidth: '1400px',
+        maxWidth: '1580px',
         margin: '0 auto',
-        padding: '0 20px',
+        padding: '0 32px',
         display: 'flex',
+        gap: '22px',
         justifyContent: 'space-between',
         alignItems: 'center'
+    },
+    navbarContentMobile: {
+        maxWidth: '1580px',
+        margin: '0 auto',
+        padding: '0 16px',
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        gap: '12px'
+    },
+    navbarCenter: {
+        flex: 1,
+        maxWidth: '760px',
+        minWidth: 0
     },
     navbarBrand: {
         display: 'flex',
@@ -454,7 +1016,39 @@ const styles = {
     },
     navbarActions: {
         display: 'flex',
-        gap: '12px'
+        gap: '12px',
+        flexShrink: 0
+    },
+    navbarActionsMobile: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+        gap: '10px'
+    },
+    commandForm: {
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) auto',
+        gap: '8px',
+        alignItems: 'center'
+    },
+    commandInput: {
+        border: '1px solid var(--card-border)',
+        borderRadius: '12px',
+        padding: '11px 14px',
+        background: 'var(--app-bg)',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        height: '44px',
+        boxSizing: 'border-box'
+    },
+    commandButton: {
+        border: 'none',
+        borderRadius: '10px',
+        background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+        color: '#fff',
+        fontWeight: '700',
+        height: '44px',
+        padding: '0 16px',
+        cursor: 'pointer'
     },
     profileButton: {
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -466,6 +1060,18 @@ const styles = {
         fontSize: '14px',
         fontWeight: '600',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+        transition: 'all 0.3s ease'
+    },
+    settingsButton: {
+        background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+        color: 'white',
+        border: 'none',
+        padding: '12px 24px',
+        borderRadius: '10px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '600',
+        boxShadow: '0 4px 15px rgba(2,132,199,0.4)',
         transition: 'all 0.3s ease'
     },
     logoutButton: {
@@ -493,12 +1099,222 @@ const styles = {
         fontWeight: '600'
     },
     container: {
-        maxWidth: '1400px',
+        maxWidth: '1580px',
         margin: '0 auto',
-        padding: '40px 20px'
+        padding: '46px 32px'
+    },
+    containerMobile: {
+        maxWidth: '1580px',
+        margin: '0 auto',
+        padding: '24px 16px'
+    },
+    shellGrid: {
+        display: 'grid',
+        gridTemplateColumns: '240px minmax(760px, 1fr) 300px',
+        gap: '28px',
+        alignItems: 'start'
+    },
+    shellGridTablet: {
+        display: 'grid',
+        gridTemplateColumns: '220px minmax(0, 1fr)',
+        gap: '20px',
+        alignItems: 'start'
+    },
+    shellGridMobile: {
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        gap: '16px',
+        alignItems: 'start'
+    },
+    leftSidebar: {
+        position: 'sticky',
+        top: '92px',
+        backgroundColor: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '18px',
+        padding: '18px',
+        boxShadow: '0 8px 20px rgba(0,0,0,0.08)'
+    },
+    leftSidebarMobile: {
+        backgroundColor: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '16px',
+        padding: '14px',
+        boxShadow: '0 8px 20px rgba(0,0,0,0.08)'
+    },
+    sidebarTitle: {
+        marginTop: 0,
+        marginBottom: '10px',
+        color: 'var(--text-primary)',
+        fontSize: '15px'
+    },
+    sidebarButton: {
+        width: '100%',
+        border: '1px solid var(--card-border)',
+        background: 'var(--app-bg)',
+        color: 'var(--text-primary)',
+        borderRadius: '12px',
+        padding: '12px 14px',
+        cursor: 'pointer',
+        textAlign: 'left',
+        marginBottom: '10px',
+        fontWeight: '600'
+    },
+    mainCanvas: {
+        minWidth: 0,
+        display: 'grid',
+        gap: '24px'
+    },
+    mainCanvasCompact: {
+        minWidth: 0,
+        display: 'grid',
+        gap: '18px',
+        transform: 'scale(0.98)',
+        transformOrigin: 'top center'
+    },
+    rightSidebar: {
+        position: 'sticky',
+        top: '92px',
+        display: 'grid',
+        gap: '14px'
+    },
+    rightSidebarTablet: {
+        display: 'grid',
+        gap: '14px',
+        gridColumn: '2 / 3'
+    },
+    rightSidebarMobile: {
+        display: 'grid',
+        gap: '12px'
+    },
+    sideCard: {
+        backgroundColor: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '18px',
+        padding: '18px',
+        boxShadow: '0 8px 20px rgba(0,0,0,0.08)'
+    },
+    sideCardTitle: {
+        marginTop: 0,
+        marginBottom: '10px',
+        color: 'var(--text-primary)',
+        fontSize: '15px'
+    },
+    calendarHeader: {
+        display: 'grid',
+        gridTemplateColumns: '1fr auto auto',
+        alignItems: 'center',
+        gap: '6px'
+    },
+    calendarNavButton: {
+        border: '1px solid var(--card-border)',
+        background: 'var(--app-bg)',
+        color: 'var(--text-primary)',
+        borderRadius: '8px',
+        width: '30px',
+        height: '30px',
+        cursor: 'pointer',
+        fontWeight: '700'
+    },
+    calendarMonthLabel: {
+        color: 'var(--text-primary)',
+        fontSize: '13px',
+        fontWeight: '700',
+        marginBottom: '8px'
+    },
+    calendarWeekdays: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        gap: '4px',
+        marginBottom: '6px'
+    },
+    calendarWeekdayCell: {
+        textAlign: 'center',
+        color: 'var(--text-muted)',
+        fontSize: '11px',
+        fontWeight: '700'
+    },
+    calendarGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(7, 1fr)',
+        gap: '4px',
+        marginBottom: '10px'
+    },
+    calendarDayCell: {
+        border: '1px solid var(--card-border)',
+        background: 'var(--app-bg)',
+        color: 'var(--text-primary)',
+        borderRadius: '8px',
+        height: '32px',
+        fontSize: '12px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        padding: 0
+    },
+    calendarDayCellMuted: {
+        opacity: 0.45
+    },
+    calendarDayCellSelected: {
+        background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+        border: 'none',
+        color: '#fff',
+        fontWeight: '700'
+    },
+    calendarEventDot: {
+        position: 'absolute',
+        width: '5px',
+        height: '5px',
+        borderRadius: '999px',
+        background: '#22c55e',
+        bottom: '4px',
+        right: '4px'
+    },
+    calendarAgenda: {
+        marginTop: '10px'
+    },
+    calendarAgendaTitle: {
+        margin: '0 0 8px 0',
+        color: 'var(--text-primary)',
+        fontSize: '13px'
+    },
+    sideEmpty: {
+        margin: '6px 0',
+        color: 'var(--text-muted)',
+        fontSize: '13px'
+    },
+    sideList: {
+        display: 'grid',
+        gap: '8px'
+    },
+    sideListItem: {
+        border: '1px solid var(--card-border)',
+        borderRadius: '10px',
+        padding: '8px 10px',
+        background: 'var(--app-bg)'
+    },
+    sideItemTitle: {
+        color: 'var(--text-primary)',
+        fontSize: '13px',
+        fontWeight: '700'
+    },
+    sideItemMeta: {
+        color: 'var(--text-muted)',
+        fontSize: '12px'
+    },
+    sideActionButton: {
+        border: 'none',
+        borderRadius: '10px',
+        padding: '8px 10px',
+        cursor: 'pointer',
+        color: '#fff',
+        background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+        fontWeight: '600'
     },
     welcomeSection: {
-        marginBottom: '40px',
+        marginBottom: '10px',
         textAlign: 'center',
         animation: 'fadeInDown 0.6s ease-out'
     },
@@ -509,14 +1325,201 @@ const styles = {
         margin: '0 0 12px 0',
         textShadow: '0 2px 10px rgba(0,0,0,0.2)'
     },
+    welcomeTitleMobile: {
+        fontSize: '30px',
+        fontWeight: '700',
+        color: 'var(--text-primary)',
+        margin: '0 0 8px 0',
+        textShadow: '0 2px 10px rgba(0,0,0,0.2)'
+    },
     welcomeSubtitle: {
         fontSize: '18px',
         color: 'var(--text-muted)',
         margin: 0,
         fontWeight: '300'
     },
+    welcomeSubtitleMobile: {
+        fontSize: '16px',
+        color: 'var(--text-muted)',
+        margin: 0,
+        fontWeight: '400'
+    },
+    welcomeMetaRow: {
+        marginTop: '14px',
+        display: 'flex',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        gap: '10px'
+    },
+    welcomeMetaChip: {
+        border: '1px solid var(--card-border)',
+        borderRadius: '999px',
+        padding: '6px 12px',
+        fontSize: '12px',
+        color: 'var(--text-secondary)',
+        background: 'var(--card-bg)',
+        fontWeight: '600'
+    },
+    hookStrip: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '20px',
+        marginBottom: '4px'
+    },
+    hookCard: {
+        backgroundColor: 'var(--card-bg)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '16px',
+        padding: '22px 24px',
+        boxShadow: '0 8px 20px rgba(0,0,0,0.08)'
+    },
+    hookLabel: {
+        fontSize: '13px',
+        color: 'var(--text-muted)',
+        marginBottom: '4px',
+        fontWeight: '600'
+    },
+    hookValue: {
+        fontSize: '28px',
+        fontWeight: '700',
+        color: 'var(--text-primary)',
+        marginBottom: '6px'
+    },
+    hookHint: {
+        fontSize: '13px',
+        color: 'var(--text-muted)'
+    },
+    scoreBar: {
+        width: '100%',
+        background: 'rgba(100,116,139,0.2)',
+        borderRadius: '999px',
+        height: '8px',
+        overflow: 'hidden',
+        marginTop: '8px'
+    },
+    scoreFill: {
+        height: '100%',
+        borderRadius: '999px',
+        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+    },
+    hookActionButton: {
+        marginTop: '6px',
+        border: 'none',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        color: '#fff',
+        fontWeight: '600',
+        padding: '8px 10px',
+        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)'
+    },
+    factCard: {
+        backgroundColor: 'var(--card-bg)',
+        borderRadius: '16px',
+        border: '1px solid var(--card-border)',
+        padding: '24px 26px',
+        marginBottom: '8px',
+        boxShadow: '0 10px 28px rgba(0,0,0,0.08)'
+    },
+    factHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '10px',
+        marginBottom: '10px'
+    },
+    factTitle: {
+        margin: 0,
+        color: 'var(--text-primary)',
+        fontSize: '20px'
+    },
+    factMoreButton: {
+        border: 'none',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        color: '#fff',
+        fontWeight: '600',
+        padding: '8px 12px',
+        background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)'
+    },
+    factText: {
+        color: 'var(--text-primary)',
+        fontSize: '16px',
+        lineHeight: 1.6,
+        marginTop: 0,
+        marginBottom: '8px'
+    },
+    factSource: {
+        color: 'var(--text-muted)',
+        fontSize: '12px',
+        margin: 0
+    },
+    checklistCard: {
+        backgroundColor: 'var(--card-bg)',
+        borderRadius: '16px',
+        border: '1px solid var(--card-border)',
+        padding: '24px 26px',
+        marginBottom: '8px',
+        boxShadow: '0 10px 28px rgba(0,0,0,0.08)'
+    },
+    checklistHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '10px',
+        marginBottom: '10px'
+    },
+    checklistTitle: {
+        margin: 0,
+        color: 'var(--text-primary)',
+        fontSize: '20px'
+    },
+    checklistProgressLabel: {
+        color: 'var(--text-muted)',
+        fontSize: '13px',
+        fontWeight: '600'
+    },
+    checklistProgressBar: {
+        width: '100%',
+        height: '8px',
+        borderRadius: '999px',
+        background: 'rgba(100,116,139,0.2)',
+        overflow: 'hidden',
+        marginBottom: '14px'
+    },
+    checklistProgressFill: {
+        height: '100%',
+        borderRadius: '999px',
+        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+    },
+    checklistItems: {
+        display: 'grid',
+        gap: '8px'
+    },
+    checklistItem: {
+        border: '1px solid var(--card-border)',
+        borderRadius: '10px',
+        background: 'var(--app-bg)',
+        color: 'var(--text-primary)',
+        textAlign: 'left',
+        padding: '10px 12px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px'
+    },
+    checklistItemDone: {
+        background: 'rgba(34,197,94,0.12)',
+        border: '1px solid rgba(34,197,94,0.5)'
+    },
+    checklistBullet: {
+        flexShrink: 0
+    },
+    checklistText: {
+        fontSize: '14px',
+        lineHeight: 1.4
+    },
     quickActions: {
-        marginBottom: '40px',
+        marginBottom: '10px',
         animation: 'fadeInUp 0.6s ease-out'
     },
     sectionTitle: {
@@ -528,14 +1531,14 @@ const styles = {
     },
     actionGrid: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '20px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '22px'
     },
     actionCard: {
         backgroundColor: 'var(--card-bg)',
         border: 'none',
         borderRadius: '20px',
-        padding: '30px 20px',
+        padding: '30px 24px',
         cursor: 'pointer',
         textAlign: 'center',
         boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
@@ -560,6 +1563,10 @@ const styles = {
         fontSize: '14px',
         color: 'var(--text-muted)',
         fontWeight: '500'
+    },
+    adminCard: {
+        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        color: 'white'
     },
     mainContent: {
         display: 'grid',
@@ -606,24 +1613,24 @@ const styles = {
     },
     petsGridLayout: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: '24px',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: '26px',
         marginTop: '20px'
     },
     petCardWrapper: {
         backgroundColor: 'var(--card-bg)',
         borderRadius: '16px',
-        overflow: 'hidden',
+        overflow: 'visible',
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
         transition: 'all 0.3s ease',
         border: '1px solid var(--card-border)',
         cursor: 'pointer'
     },
     petCardInner: {
-        padding: '20px',
+        padding: '20px 20px 24px 20px',
         display: 'flex',
         flexDirection: 'column',
-        height: '100%'
+        minHeight: '100%'
     },
     petImageContainer: {
         width: '100%',
@@ -664,17 +1671,24 @@ const styles = {
         fontWeight: '500'
     },
     petButtonRow: {
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
         gap: '10px',
-        marginTop: 'auto'
+        marginTop: 'auto',
+        paddingTop: '4px'
     },
     petSmallButton: {
-        flex: 1,
         padding: '10px 14px',
+        minHeight: '40px',
         borderRadius: '8px',
         border: 'none',
         fontSize: '13px',
         fontWeight: '600',
+        lineHeight: 1.2,
+        whiteSpace: 'nowrap',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         cursor: 'pointer',
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
@@ -722,7 +1736,7 @@ const styles = {
     activitiesList: {
         backgroundColor: 'var(--card-bg)',
         borderRadius: '20px',
-        padding: '24px',
+        padding: '28px',
         boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
     },
     activityItem: {
