@@ -214,19 +214,125 @@ const Dashboard = () => {
         const cached = localStorage.getItem(storageKey);
         if (cached) {
             try {
-                setFactOfDay(JSON.parse(cached));
-                return;
+                const parsed = JSON.parse(cached);
+                // Dynamic cache validation to ensure it has all granular fields populated correctly (prevents N/A from old cache layout)
+                if (parsed && parsed.name && parsed.scientificName && parsed.lifespan && parsed.diet && parsed.slogan) {
+                    setFactOfDay(parsed);
+                    return;
+                }
             } catch {
                 // ignore parsing issue and fetch fresh
             }
         }
 
-        const factResponse = await axios.get(`http://localhost:8080/api/facts/random?species=${factSpecies}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        const payload = factResponse.data;
-        setFactOfDay(payload);
-        localStorage.setItem(storageKey, JSON.stringify(payload));
+        const apiKey = 'umq5Kw3JhzWzxy3FbstB5hRFIwJargSdSta5PnyL';
+        const COMMON_PETS = ['dog', 'cat', 'rabbit', 'hamster', 'goldfish', 'parrot', 'iguana', 'ferret', 'turtle', 'chameleon'];
+        
+        let termIndex = factSpecies === 'any' ? (new Date().getDate() % COMMON_PETS.length) : COMMON_PETS.indexOf(factSpecies);
+        if (termIndex === -1) termIndex = 0;
+
+        let animal = null;
+
+        // Loop through COMMON_PETS to find an animal with complete data
+        for (let i = 0; i < COMMON_PETS.length; i++) {
+            const index = (termIndex + i) % COMMON_PETS.length;
+            const currentTerm = COMMON_PETS[index];
+            
+            try {
+                const url = `https://api.api-ninjas.com/v1/animals?name=${currentTerm}`;
+                const response = await axios.get(url, {
+                    headers: { 'X-Api-Key': apiKey }
+                });
+                
+                if (response.data && response.data.length > 0) {
+                    // Filter candidates that have all critical fields populated
+                    const candidate = response.data.find(a => 
+                        a.name && 
+                        a.taxonomy?.scientific_name && 
+                        a.characteristics?.lifespan && 
+                        a.characteristics?.diet
+                    );
+                    
+                    if (candidate) {
+                        animal = candidate;
+                        break;
+                    }
+                }
+            } catch (e) {
+                // Try next species in the list if fetch fails
+            }
+        }
+
+        // Ultimate reliable fallback if no candidate satisfies the filter
+        if (!animal) {
+            try {
+                const response = await axios.get(`https://api.api-ninjas.com/v1/animals?name=dog`, {
+                    headers: { 'X-Api-Key': apiKey }
+                });
+                if (response.data && response.data.length > 0) {
+                    animal = response.data[0];
+                }
+            } catch (e) {
+                // Final safety fallback to prevent empty state in case of extreme network/API issues
+                animal = {
+                    name: "Dog",
+                    taxonomy: { scientific_name: "Canis lupus familiaris" },
+                    characteristics: { lifespan: "10 - 13 years", diet: "Omnivore" }
+                };
+            }
+        }
+
+        // Fetch inspirational quote as slogan
+        let quoteText = "Happiness is a warm puppy.";
+        let quoteAuthor = "Charles M. Schulz";
+        try {
+            const quoteResponse = await axios.get('https://api.api-ninjas.com/v1/quotes?category=happiness', {
+                headers: { 'X-Api-Key': apiKey }
+            });
+            if (quoteResponse.data && quoteResponse.data.length > 0) {
+                quoteText = quoteResponse.data[0].quote;
+                quoteAuthor = quoteResponse.data[0].author;
+            }
+        } catch (e) {
+            // Ignore quotes API error, use fallback
+        }
+
+        if (animal) {
+            const name = animal.name;
+            const scientific = animal.taxonomy?.scientific_name || "";
+            const lifespan = animal.characteristics?.lifespan || "";
+            const diet = animal.characteristics?.diet || "";
+            const distinctive = animal.characteristics?.most_distinctive_feature || animal.characteristics?.distinctive_feature || "";
+            const temperament = animal.characteristics?.temperament || animal.characteristics?.group_behavior || "";
+            
+            let factParts = [];
+            if (distinctive) factParts.push(`Distinctive feature: ${distinctive}.`);
+            if (temperament) factParts.push(`Temperament: ${temperament}.`);
+            if (lifespan) factParts.push(`Average lifespan: ${lifespan}.`);
+            if (diet) factParts.push(`Diet: ${diet}.`);
+            
+            const factText = factParts.length > 0 
+                ? `The ${name} (${scientific || 'scientific name pending'}) is a fascinating animal. ${factParts.join(' ')}`
+                : `The ${name} (${scientific || 'scientific name pending'}) is known for its unique characteristics and roles in human households and environments.`;
+
+            const payload = {
+                species: name.toLowerCase(),
+                name: name,
+                scientificName: scientific,
+                lifespan: lifespan,
+                diet: diet,
+                distinctiveFeature: distinctive,
+                temperament: temperament,
+                fact: factText,
+                slogan: `"${quoteText}" — ${quoteAuthor}`,
+                source: 'API Ninjas Animals API'
+            };
+
+            setFactOfDay(payload);
+            localStorage.setItem(storageKey, JSON.stringify(payload));
+        } else {
+            throw new Error("No animal details returned from API Ninjas");
+        }
     };
 
     const calculateActivityStreak = (activities) => {
@@ -649,8 +755,39 @@ const Dashboard = () => {
                         <h3 style={styles.factTitle}>Fact of the Day</h3>
                         <button onClick={() => navigate('/facts')} style={styles.factMoreButton}>More facts</button>
                     </div>
-                    <p style={styles.factText}>{factOfDay?.fact || 'Loading your daily pet fact...'}</p>
-                    <p style={styles.factSource}>Source: {factOfDay?.source || 'Fetching source'}</p>
+                    {factOfDay ? (
+                        <div style={styles.factContentLayout}>
+                            <div style={styles.factGrid}>
+                                <div style={styles.factMiniCard}>
+                                    <span style={styles.factMiniLabel}>🧬 Species</span>
+                                    <span style={styles.factMiniValue}>{factOfDay.name || 'Pet'}</span>
+                                </div>
+                                <div style={styles.factMiniCard}>
+                                    <span style={styles.factMiniLabel}>🔬 Scientific</span>
+                                    <span style={{ ...styles.factMiniValue, fontStyle: 'italic' }}>{factOfDay.scientificName || 'N/A'}</span>
+                                </div>
+                                <div style={styles.factMiniCard}>
+                                    <span style={styles.factMiniLabel}>⏳ Lifespan</span>
+                                    <span style={styles.factMiniValue}>{factOfDay.lifespan || 'N/A'}</span>
+                                </div>
+                                <div style={styles.factMiniCard}>
+                                    <span style={styles.factMiniLabel}>🥗 Diet</span>
+                                    <span style={styles.factMiniValue}>{factOfDay.diet || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div style={styles.factDescWrap}>
+                                <div>
+                                    <p style={styles.factText}>{factOfDay.fact}</p>
+                                    {factOfDay.slogan && (
+                                        <p style={styles.factSloganQuote}>💡 {factOfDay.slogan}</p>
+                                    )}
+                                </div>
+                                <p style={{ ...styles.factSource, marginTop: '8px' }}>Source: {factOfDay.source}</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <p style={styles.factText}>Loading your daily pet fact...</p>
+                    )}
                 </div>
 
                 <div style={styles.checklistCard}>
@@ -1439,7 +1576,7 @@ const styles = {
     },
     factText: {
         color: 'var(--text-primary)',
-        fontSize: '16px',
+        fontSize: '15px',
         lineHeight: 1.6,
         marginTop: 0,
         marginBottom: '8px'
@@ -1448,6 +1585,57 @@ const styles = {
         color: 'var(--text-muted)',
         fontSize: '12px',
         margin: 0
+    },
+    factContentLayout: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '20px',
+        marginTop: '14px'
+    },
+    factGrid: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '12px'
+    },
+    factMiniCard: {
+        backgroundColor: 'rgba(102, 126, 234, 0.04)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '12px',
+        padding: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        justifyContent: 'center'
+    },
+    factMiniLabel: {
+        fontSize: '11px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+        color: 'var(--text-muted)',
+        fontWeight: '600'
+    },
+    factMiniValue: {
+        fontSize: '13px',
+        color: 'var(--text-primary)',
+        fontWeight: '700'
+    },
+    factDescWrap: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        backgroundColor: 'rgba(102, 126, 234, 0.02)',
+        border: '1px solid var(--card-border)',
+        borderRadius: '16px',
+        padding: '18px'
+    },
+    factSloganQuote: {
+        borderLeft: '4px solid #667eea',
+        paddingLeft: '12px',
+        margin: '10px 0 0 0',
+        fontStyle: 'italic',
+        fontSize: '13px',
+        color: 'var(--text-secondary)',
+        lineHeight: '1.5'
     },
     checklistCard: {
         backgroundColor: 'var(--card-bg)',
