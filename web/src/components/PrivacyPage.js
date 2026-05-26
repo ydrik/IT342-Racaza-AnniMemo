@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from './Header';
 
 const PrivacyPage = () => {
     const navigate = useNavigate();
@@ -17,12 +18,12 @@ const PrivacyPage = () => {
         pageContainer: {
             minHeight: '100vh',
             background: 'var(--app-bg)',
-            padding: '40px 20px',
             fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
         },
         container: {
             maxWidth: '900px',
-            margin: '0 auto'
+            margin: '0 auto',
+            padding: '40px 20px'
         },
         header: {
             marginBottom: '40px'
@@ -31,11 +32,14 @@ const PrivacyPage = () => {
             backgroundColor: 'transparent',
             border: 'none',
             color: 'var(--text-primary)',
-            fontSize: '16px',
+            fontSize: '14px',
             cursor: 'pointer',
-            padding: '10px 0',
-            fontWeight: '500',
-            marginBottom: '20px'
+            marginBottom: '16px',
+            padding: '10px 20px',
+            fontWeight: '600',
+            borderRadius: '20px',
+            transition: 'all 0.3s ease',
+            display: 'inline-block'
         },
         title: {
             fontSize: '42px',
@@ -83,15 +87,14 @@ const PrivacyPage = () => {
 
     return (
         <div style={styles.pageContainer}>
+            <Header />
             <div style={styles.container}>
                 <div style={styles.header}>
                     <button
                         onClick={handleBackClick}
                         style={styles.backButton}
-                        onMouseEnter={(e) => e.target.style.opacity = '0.7'}
-                        onMouseLeave={(e) => e.target.style.opacity = '1'}
                     >
-                        ← Back to Home
+                        {localStorage.getItem('token') ? '← Back to Dashboard' : '← Back to Home'}
                     </button>
                     <h1 style={styles.title}>Privacy Policy</h1>
                 </div>
