@@ -18,5 +18,19 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
         binding.navView.setupWithNavController(navController)
+        binding.navView.setOnItemSelectedListener { item ->
+            val id = item.itemId
+            if (navController.currentDestination?.id == id) {
+                return@setOnItemSelectedListener true
+            }
+            navController.navigate(id, null, androidx.navigation.navOptions {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            })
+            true
+        }
     }
 }

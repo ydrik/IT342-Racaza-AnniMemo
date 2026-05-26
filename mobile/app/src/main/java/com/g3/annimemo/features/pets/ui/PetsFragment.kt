@@ -48,6 +48,11 @@ class PetsFragment : Fragment() {
     }
 
     private fun setupUI() {
+        // Back to Dashboard button
+        binding.btnBackToDashboard.setOnClickListener {
+            androidx.navigation.fragment.NavHostFragment.findNavController(this).navigate(com.g3.annimemo.R.id.navigation_dashboard)
+        }
+
         // Setup RecyclerView
         petsAdapter = PetsAdapter(
             pets = petsList,

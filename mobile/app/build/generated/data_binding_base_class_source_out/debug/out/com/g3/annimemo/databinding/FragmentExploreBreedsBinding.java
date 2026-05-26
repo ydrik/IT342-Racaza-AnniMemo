@@ -23,6 +23,9 @@ public final class FragmentExploreBreedsBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
+  public final Button btnBackToDashboard;
+
+  @NonNull
   public final Button btnTabCats;
 
   @NonNull
@@ -41,10 +44,11 @@ public final class FragmentExploreBreedsBinding implements ViewBinding {
   public final RecyclerView rvBreeds;
 
   private FragmentExploreBreedsBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull Button btnTabCats, @NonNull Button btnTabDogs, @NonNull Button btnTabOthers,
-      @NonNull EditText etBreedSearch, @NonNull ProgressBar pbBreedsLoading,
-      @NonNull RecyclerView rvBreeds) {
+      @NonNull Button btnBackToDashboard, @NonNull Button btnTabCats, @NonNull Button btnTabDogs,
+      @NonNull Button btnTabOthers, @NonNull EditText etBreedSearch,
+      @NonNull ProgressBar pbBreedsLoading, @NonNull RecyclerView rvBreeds) {
     this.rootView = rootView;
+    this.btnBackToDashboard = btnBackToDashboard;
     this.btnTabCats = btnTabCats;
     this.btnTabDogs = btnTabDogs;
     this.btnTabOthers = btnTabOthers;
@@ -80,6 +84,12 @@ public final class FragmentExploreBreedsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btn_back_to_dashboard;
+      Button btnBackToDashboard = ViewBindings.findChildViewById(rootView, id);
+      if (btnBackToDashboard == null) {
+        break missingId;
+      }
+
       id = R.id.btn_tab_cats;
       Button btnTabCats = ViewBindings.findChildViewById(rootView, id);
       if (btnTabCats == null) {
@@ -116,8 +126,8 @@ public final class FragmentExploreBreedsBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentExploreBreedsBinding((CoordinatorLayout) rootView, btnTabCats, btnTabDogs,
-          btnTabOthers, etBreedSearch, pbBreedsLoading, rvBreeds);
+      return new FragmentExploreBreedsBinding((CoordinatorLayout) rootView, btnBackToDashboard,
+          btnTabCats, btnTabDogs, btnTabOthers, etBreedSearch, pbBreedsLoading, rvBreeds);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

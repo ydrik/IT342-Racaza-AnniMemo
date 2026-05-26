@@ -58,6 +58,11 @@ class ExploreBreedsFragment : Fragment() {
     }
 
     private fun setupUI() {
+        // Back to Dashboard button
+        binding.btnBackToDashboard.setOnClickListener {
+            androidx.navigation.fragment.NavHostFragment.findNavController(this).navigate(com.g3.annimemo.R.id.navigation_dashboard)
+        }
+
         // Tab buttons
         binding.btnTabDogs.setOnClickListener { selectTab(0) }
         binding.btnTabCats.setOnClickListener { selectTab(1) }

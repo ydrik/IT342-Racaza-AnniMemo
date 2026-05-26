@@ -24,6 +24,9 @@ public final class FragmentPetsBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
+  public final Button btnBackToDashboard;
+
+  @NonNull
   public final Button btnPetsAddFirst;
 
   @NonNull
@@ -38,10 +41,12 @@ public final class FragmentPetsBinding implements ViewBinding {
   @NonNull
   public final TextView tvPetsMessage;
 
-  private FragmentPetsBinding(@NonNull CoordinatorLayout rootView, @NonNull Button btnPetsAddFirst,
+  private FragmentPetsBinding(@NonNull CoordinatorLayout rootView,
+      @NonNull Button btnBackToDashboard, @NonNull Button btnPetsAddFirst,
       @NonNull FloatingActionButton fabAddPet, @NonNull LinearLayout layoutPetsEmpty,
       @NonNull RecyclerView rvPets, @NonNull TextView tvPetsMessage) {
     this.rootView = rootView;
+    this.btnBackToDashboard = btnBackToDashboard;
     this.btnPetsAddFirst = btnPetsAddFirst;
     this.fabAddPet = fabAddPet;
     this.layoutPetsEmpty = layoutPetsEmpty;
@@ -76,6 +81,12 @@ public final class FragmentPetsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btn_back_to_dashboard;
+      Button btnBackToDashboard = ViewBindings.findChildViewById(rootView, id);
+      if (btnBackToDashboard == null) {
+        break missingId;
+      }
+
       id = R.id.btn_pets_add_first;
       Button btnPetsAddFirst = ViewBindings.findChildViewById(rootView, id);
       if (btnPetsAddFirst == null) {
@@ -106,8 +117,8 @@ public final class FragmentPetsBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentPetsBinding((CoordinatorLayout) rootView, btnPetsAddFirst, fabAddPet,
-          layoutPetsEmpty, rvPets, tvPetsMessage);
+      return new FragmentPetsBinding((CoordinatorLayout) rootView, btnBackToDashboard,
+          btnPetsAddFirst, fabAddPet, layoutPetsEmpty, rvPets, tvPetsMessage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

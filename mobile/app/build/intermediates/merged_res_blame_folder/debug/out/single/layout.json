@@ -36,6 +36,10 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\item_reminder.xml"
     },
     {
+        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_pets.xml",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_pets.xml"
+    },
+    {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\item_activity.xml",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\item_activity.xml"
     },
@@ -48,16 +52,12 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\fragment_appointments.xml"
     },
     {
-        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_settings.xml",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_settings.xml"
+        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_explore_breeds.xml",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_explore_breeds.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\item_appointment.xml",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\item_appointment.xml"
-    },
-    {
-        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_reminders.xml",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_reminders.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\fragment_settings.xml",

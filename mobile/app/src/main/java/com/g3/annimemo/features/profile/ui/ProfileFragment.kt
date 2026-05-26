@@ -87,6 +87,16 @@ class ProfileFragment : Fragment() {
         binding.btnChangePassword.setOnClickListener {
             performPasswordChange()
         }
+
+        // Log out button click listener
+        binding.btnLogout.setOnClickListener {
+            tokenManager.clear()
+            val intent = android.content.Intent(activity, com.g3.annimemo.features.auth.ui.LoginActivity::class.java).apply {
+                flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            activity?.finish()
+        }
     }
 
     private fun loadProfileData() {

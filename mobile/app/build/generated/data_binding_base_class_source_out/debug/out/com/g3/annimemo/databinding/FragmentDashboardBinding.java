@@ -17,6 +17,7 @@ import androidx.core.widget.NestedScrollView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.g3.annimemo.R;
+import com.google.android.material.chip.ChipGroup;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -71,6 +72,9 @@ public final class FragmentDashboardBinding implements ViewBinding {
   public final CalendarView calendarView;
 
   @NonNull
+  public final ChipGroup cgActiveDates;
+
+  @NonNull
   public final LinearLayout checklistContainer;
 
   @NonNull
@@ -93,6 +97,9 @@ public final class FragmentDashboardBinding implements ViewBinding {
 
   @NonNull
   public final LinearLayout healthTrendsContainer;
+
+  @NonNull
+  public final LinearLayout layoutCalendarActiveDates;
 
   @NonNull
   public final ProgressBar pbCareScore;
@@ -150,11 +157,12 @@ public final class FragmentDashboardBinding implements ViewBinding {
       @NonNull Button btnActionSettings, @NonNull Button btnAddTask,
       @NonNull TextView btnClearSearch, @NonNull TextView btnSettingsGear,
       @NonNull Button btnStreakCheckin, @NonNull LinearLayout calendarAgendaContainer,
-      @NonNull CalendarView calendarView, @NonNull LinearLayout checklistContainer,
-      @NonNull CardView cvDueSoonCard, @NonNull CardView cvFactCard,
-      @NonNull CardView cvSearchSuggestions, @NonNull LinearLayout dueSoonContainer,
-      @NonNull EditText etNewTask, @NonNull EditText etSearch,
-      @NonNull LinearLayout healthTrendsContainer, @NonNull ProgressBar pbCareScore,
+      @NonNull CalendarView calendarView, @NonNull ChipGroup cgActiveDates,
+      @NonNull LinearLayout checklistContainer, @NonNull CardView cvDueSoonCard,
+      @NonNull CardView cvFactCard, @NonNull CardView cvSearchSuggestions,
+      @NonNull LinearLayout dueSoonContainer, @NonNull EditText etNewTask,
+      @NonNull EditText etSearch, @NonNull LinearLayout healthTrendsContainer,
+      @NonNull LinearLayout layoutCalendarActiveDates, @NonNull ProgressBar pbCareScore,
       @NonNull ProgressBar pbChecklist, @NonNull LinearLayout suggestionsContainer,
       @NonNull TextView tvAdjustmentsSpecies, @NonNull TextView tvAdjustmentsWindow,
       @NonNull TextView tvCareScoreValue, @NonNull TextView tvChecklistCount,
@@ -179,6 +187,7 @@ public final class FragmentDashboardBinding implements ViewBinding {
     this.btnStreakCheckin = btnStreakCheckin;
     this.calendarAgendaContainer = calendarAgendaContainer;
     this.calendarView = calendarView;
+    this.cgActiveDates = cgActiveDates;
     this.checklistContainer = checklistContainer;
     this.cvDueSoonCard = cvDueSoonCard;
     this.cvFactCard = cvFactCard;
@@ -187,6 +196,7 @@ public final class FragmentDashboardBinding implements ViewBinding {
     this.etNewTask = etNewTask;
     this.etSearch = etSearch;
     this.healthTrendsContainer = healthTrendsContainer;
+    this.layoutCalendarActiveDates = layoutCalendarActiveDates;
     this.pbCareScore = pbCareScore;
     this.pbChecklist = pbChecklist;
     this.suggestionsContainer = suggestionsContainer;
@@ -322,6 +332,12 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.cg_active_dates;
+      ChipGroup cgActiveDates = ViewBindings.findChildViewById(rootView, id);
+      if (cgActiveDates == null) {
+        break missingId;
+      }
+
       id = R.id.checklist_container;
       LinearLayout checklistContainer = ViewBindings.findChildViewById(rootView, id);
       if (checklistContainer == null) {
@@ -367,6 +383,12 @@ public final class FragmentDashboardBinding implements ViewBinding {
       id = R.id.health_trends_container;
       LinearLayout healthTrendsContainer = ViewBindings.findChildViewById(rootView, id);
       if (healthTrendsContainer == null) {
+        break missingId;
+      }
+
+      id = R.id.layout_calendar_active_dates;
+      LinearLayout layoutCalendarActiveDates = ViewBindings.findChildViewById(rootView, id);
+      if (layoutCalendarActiveDates == null) {
         break missingId;
       }
 
@@ -470,11 +492,12 @@ public final class FragmentDashboardBinding implements ViewBinding {
           appointmentsContainer, btnActionAppointments, btnActionBreeds, btnActionHealth,
           btnActionPets, btnActionProfile, btnActionReminders, btnActionSettings, btnAddTask,
           btnClearSearch, btnSettingsGear, btnStreakCheckin, calendarAgendaContainer, calendarView,
-          checklistContainer, cvDueSoonCard, cvFactCard, cvSearchSuggestions, dueSoonContainer,
-          etNewTask, etSearch, healthTrendsContainer, pbCareScore, pbChecklist,
-          suggestionsContainer, tvAdjustmentsSpecies, tvAdjustmentsWindow, tvCareScoreValue,
-          tvChecklistCount, tvDueSoonValue, tvFactDiet, tvFactLifespan, tvFactScientific,
-          tvFactSpecies, tvFactText, tvStreakValue, tvWelcomeSubtitle, tvWelcomeTitle);
+          cgActiveDates, checklistContainer, cvDueSoonCard, cvFactCard, cvSearchSuggestions,
+          dueSoonContainer, etNewTask, etSearch, healthTrendsContainer, layoutCalendarActiveDates,
+          pbCareScore, pbChecklist, suggestionsContainer, tvAdjustmentsSpecies, tvAdjustmentsWindow,
+          tvCareScoreValue, tvChecklistCount, tvDueSoonValue, tvFactDiet, tvFactLifespan,
+          tvFactScientific, tvFactSpecies, tvFactText, tvStreakValue, tvWelcomeSubtitle,
+          tvWelcomeTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

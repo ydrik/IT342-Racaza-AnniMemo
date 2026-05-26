@@ -143,6 +143,16 @@ class RegisterActivity : AppCompatActivity() {
                     binding.loadingIndicator.visibility = View.GONE
 
                     if (response.isSuccessful) {
+                        val localStorage = com.g3.annimemo.core.data.LocalStorageManager(this@RegisterActivity)
+                        localStorage.saveUserProfile(
+                            com.g3.annimemo.core.network.UserProfileDto(
+                                username = user,
+                                firstName = first,
+                                lastName = last,
+                                email = email,
+                                role = "USER"
+                            )
+                        )
                         showSuccess("Registration successful! Redirecting to login...")
                         
                         // Delay then redirect to login

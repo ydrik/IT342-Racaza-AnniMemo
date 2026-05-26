@@ -12,6 +12,10 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\item_breed.xml"
     },
     {
+        "merged": "com.g3.annimemo.app-merged_res-50:/drawable_bg_gradient_primary.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/drawable/bg_gradient_primary.xml"
+    },
+    {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_item_activity.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\item_activity.xml"
     },
@@ -20,12 +24,12 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\drawable\\bg_app_gradient.xml"
     },
     {
-        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_settings.xml.flat",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_settings.xml"
-    },
-    {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_activity_login.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_explore_breeds.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_explore_breeds.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_activity_register.xml.flat",
@@ -58,6 +62,10 @@
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_fragment_appointments.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\fragment_appointments.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_pets.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_pets.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_fragment_explore_breeds.xml.flat",
@@ -98,10 +106,6 @@
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_fragment_reminders.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\fragment_reminders.xml"
-    },
-    {
-        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_reminders.xml.flat",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_reminders.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\navigation_nav_graph.xml.flat",

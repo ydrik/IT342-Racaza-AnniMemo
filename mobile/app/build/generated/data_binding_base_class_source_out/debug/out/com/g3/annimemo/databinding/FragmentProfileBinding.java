@@ -29,6 +29,9 @@ public final class FragmentProfileBinding implements ViewBinding {
   public final Button btnChangePassword;
 
   @NonNull
+  public final Button btnLogout;
+
+  @NonNull
   public final Button btnRemovePhoto;
 
   @NonNull
@@ -69,7 +72,7 @@ public final class FragmentProfileBinding implements ViewBinding {
 
   private FragmentProfileBinding(@NonNull NestedScrollView rootView,
       @NonNull Button btnBackToDashboard, @NonNull Button btnChangePassword,
-      @NonNull Button btnRemovePhoto, @NonNull Button btnSaveProfile,
+      @NonNull Button btnLogout, @NonNull Button btnRemovePhoto, @NonNull Button btnSaveProfile,
       @NonNull Button btnUploadPhoto, @NonNull EditText etProfileConfirmPassword,
       @NonNull EditText etProfileCurrentPassword, @NonNull EditText etProfileEmail,
       @NonNull EditText etProfileFirstName, @NonNull EditText etProfileLastName,
@@ -79,6 +82,7 @@ public final class FragmentProfileBinding implements ViewBinding {
     this.rootView = rootView;
     this.btnBackToDashboard = btnBackToDashboard;
     this.btnChangePassword = btnChangePassword;
+    this.btnLogout = btnLogout;
     this.btnRemovePhoto = btnRemovePhoto;
     this.btnSaveProfile = btnSaveProfile;
     this.btnUploadPhoto = btnUploadPhoto;
@@ -130,6 +134,12 @@ public final class FragmentProfileBinding implements ViewBinding {
       id = R.id.btn_change_password;
       Button btnChangePassword = ViewBindings.findChildViewById(rootView, id);
       if (btnChangePassword == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_logout;
+      Button btnLogout = ViewBindings.findChildViewById(rootView, id);
+      if (btnLogout == null) {
         break missingId;
       }
 
@@ -212,7 +222,7 @@ public final class FragmentProfileBinding implements ViewBinding {
       }
 
       return new FragmentProfileBinding((NestedScrollView) rootView, btnBackToDashboard,
-          btnChangePassword, btnRemovePhoto, btnSaveProfile, btnUploadPhoto,
+          btnChangePassword, btnLogout, btnRemovePhoto, btnSaveProfile, btnUploadPhoto,
           etProfileConfirmPassword, etProfileCurrentPassword, etProfileEmail, etProfileFirstName,
           etProfileLastName, etProfileNewPassword, etProfileUsername, ivProfileAvatar,
           tvProfileInitials, tvProfileMessage);
