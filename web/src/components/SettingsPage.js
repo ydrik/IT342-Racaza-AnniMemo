@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from './Header';
 
 const defaultSettings = {
     reminderWindowDays: 7,
@@ -74,6 +75,7 @@ const SettingsPage = () => {
 
     return (
         <div style={styles.page}>
+            <Header />
             <div style={styles.container}>
                 <button onClick={() => navigate('/dashboard')} style={styles.backButton}>← Back to Dashboard</button>
                 <h1 style={styles.title}>Settings</h1>
@@ -165,9 +167,21 @@ const SettingsPage = () => {
 };
 
 const styles = {
-    page: { minHeight: '100vh', background: 'var(--app-bg)', padding: '30px 20px' },
-    container: { maxWidth: '900px', margin: '0 auto' },
-    backButton: { border: 'none', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', marginBottom: '10px' },
+    page: { minHeight: '100vh', background: 'var(--app-bg)' },
+    container: { maxWidth: '900px', margin: '0 auto', padding: '30px 20px' },
+    backButton: {
+        backgroundColor: 'transparent',
+        border: 'none',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        cursor: 'pointer',
+        marginBottom: '16px',
+        padding: '10px 20px',
+        fontWeight: '600',
+        borderRadius: '20px',
+        transition: 'all 0.3s ease',
+        display: 'inline-block'
+    },
     title: { color: 'var(--text-primary)', margin: 0 },
     subtitle: { color: 'var(--text-muted)', marginTop: '8px', marginBottom: '18px' },
     success: { background: '#d1fae5', color: '#065f46', padding: '10px 12px', borderRadius: '10px', marginBottom: '10px' },

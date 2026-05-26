@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from './Header';
 
 const RemindersPage = () => {
     const navigate = useNavigate();
@@ -278,6 +279,7 @@ const RemindersPage = () => {
 
     return (
         <div style={styles.page}>
+            <Header />
             <div style={styles.container}>
                 <button onClick={() => navigate('/dashboard')} style={styles.backButton}>← Back to Dashboard</button>
                 <h1 style={styles.title}>Reminders</h1>
@@ -454,10 +456,22 @@ const RemindersPage = () => {
 };
 
 const styles = {
-    page: { minHeight: '100vh', background: 'var(--app-bg)', padding: '30px 20px' },
-    container: { maxWidth: '1100px', margin: '0 auto' },
+    page: { minHeight: '100vh', background: 'var(--app-bg)' },
+    container: { maxWidth: '1100px', margin: '0 auto', padding: '30px 20px' },
     loading: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-    backButton: { border: 'none', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', marginBottom: '12px' },
+    backButton: {
+        backgroundColor: 'transparent',
+        border: 'none',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        cursor: 'pointer',
+        marginBottom: '16px',
+        padding: '10px 20px',
+        fontWeight: '600',
+        borderRadius: '20px',
+        transition: 'all 0.3s ease',
+        display: 'inline-block'
+    },
     title: { color: 'var(--text-primary)', margin: 0 },
     subtitle: { color: 'var(--text-muted)', marginTop: '8px', marginBottom: '18px' },
     message: { padding: '10px 12px', borderRadius: '10px', marginBottom: '14px' },

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ActivityService from '../services/activity.service';
+import Header from './Header';
 
 const HealthMetrics = () => {
     const navigate = useNavigate();
@@ -310,6 +311,7 @@ const HealthMetrics = () => {
 
     return (
         <div style={styles.pageContainer}>
+            <Header />
             <div style={styles.container}>
                 <div style={styles.headerSection}>
                     <button onClick={() => navigate('/pets')} style={styles.backButton}>
@@ -697,12 +699,12 @@ const styles = {
     pageContainer: {
         minHeight: '100vh',
         background: 'var(--app-bg)',
-        padding: '40px 20px',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     },
     container: {
         maxWidth: '1100px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '40px 20px'
     },
     loadingContainer: {
         display: 'flex',

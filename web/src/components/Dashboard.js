@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import LogoutModal from './LogoutModal';
+import Header from './Header';
 import ActivityService from '../services/activity.service';
 
 const CALENDAR_WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -46,14 +46,13 @@ const Dashboard = () => {
     const [activityStreak, setActivityStreak] = useState(0);
     const [todayChecklist, setTodayChecklist] = useState([]);
     const [newChecklistItemText, setNewChecklistItemText] = useState('');
-    const [commandQuery, setCommandQuery] = useState('');
     const [dashboardSettings, setDashboardSettings] = useState({
         reminderWindowDays: 7,
         defaultFactSpecies: 'any',
         compactDashboard: false
     });
     const [isLoading, setIsLoading] = useState(true);
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
+
     const [viewportWidth, setViewportWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440);
     const [calendarMonth, setCalendarMonth] = useState(() => {
         const now = new Date();
@@ -442,36 +441,7 @@ const Dashboard = () => {
         localStorage.setItem(getChecklistStorageKey(), JSON.stringify(updated));
     };
 
-    const handleCommandSubmit = (e) => {
-        e.preventDefault();
-        const normalized = commandQuery.trim().toLowerCase();
-        if (!normalized) {
-            return;
-        }
 
-        if (normalized.includes('pet')) {
-            navigate('/pets');
-            return;
-        }
-        if (normalized.includes('reminder') || normalized.includes('task')) {
-            navigate('/reminders');
-            return;
-        }
-        if (normalized.includes('fact')) {
-            navigate('/facts');
-            return;
-        }
-        if (normalized.includes('profile') || normalized.includes('account')) {
-            navigate('/profile');
-            return;
-        }
-        if (normalized.includes('setting') || normalized.includes('preference')) {
-            navigate('/settings');
-            return;
-        }
-
-        setCommandQuery('');
-    };
 
     const completedChecklistCount = todayChecklist.filter((item) => item.done).length;
     const checklistCompletion = todayChecklist.length
@@ -510,19 +480,7 @@ const Dashboard = () => {
         year: 'numeric'
     });
 
-    const handleLogout = () => {
-        setShowLogoutModal(true);
-    };
 
-    const confirmLogout = () => {
-        // Activity Diagram: Destroy Session / Clear Token
-        localStorage.removeItem('token');
-        navigate('/login');
-    };
-
-    const cancelLogout = () => {
-        setShowLogoutModal(false);
-    };
 
     const formatActivityTimestamp = (value) => {
         if (!value) {
@@ -665,9 +623,6 @@ const Dashboard = () => {
     const isTablet = viewportWidth < 1460;
     const isMobile = viewportWidth < 1024;
     const shellStyle = isMobile ? styles.shellGridMobile : isTablet ? styles.shellGridTablet : styles.shellGrid;
-    const navbarContentStyle = isMobile ? styles.navbarContentMobile : styles.navbarContent;
-    const navbarActionsStyle = isMobile ? styles.navbarActionsMobile : styles.navbarActions;
-    const navbarCenterStyle = styles.navbarCenter;
     const containerStyle = isMobile ? styles.containerMobile : styles.container;
     const leftSidebarStyle = isMobile ? styles.leftSidebarMobile : styles.leftSidebar;
     const rightSidebarStyle = isMobile ? styles.rightSidebarMobile : isTablet ? styles.rightSidebarTablet : styles.rightSidebar;
@@ -677,38 +632,7 @@ const Dashboard = () => {
     return (
         <div style={styles.pageContainer}>
             {/* Header / Navigation Bar */}
-            <header style={styles.navbar}>
-                <div style={navbarContentStyle}>
-                    <div style={styles.navbarBrand}>
-                        <h2 style={styles.brandTitle}>🐾 AnniMemo</h2>
-                    </div>
-
-                    <div style={navbarCenterStyle}>
-                        <form onSubmit={handleCommandSubmit} style={styles.commandForm}>
-                            <input
-                                value={commandQuery}
-                                onChange={(e) => setCommandQuery(e.target.value)}
-                                placeholder="Quick jump: pets, reminders, facts..."
-                                style={styles.commandInput}
-                                aria-label="Quick command"
-                            />
-                            <button type="submit" style={styles.commandButton}>Go</button>
-                        </form>
-                    </div>
-
-                    <div style={navbarActionsStyle}>
-                        <button onClick={() => navigate('/settings')} style={styles.settingsButton}>
-                            ⚙️ Settings
-                        </button>
-                        <button onClick={() => navigate('/profile')} style={styles.profileButton}>
-                            👤 Profile
-                        </button>
-                        <button onClick={handleLogout} style={styles.logoutButton}>
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </header>
+            <Header />
 
             <div style={containerStyle}>
                 <div style={shellStyle}>
@@ -1111,11 +1035,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <LogoutModal 
-                isOpen={showLogoutModal}
-                onConfirm={confirmLogout}
-                onCancel={cancelLogout}
-            />
+
         </div>
     );
 };

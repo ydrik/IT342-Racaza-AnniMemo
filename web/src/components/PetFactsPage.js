@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from './Header';
 
 const PetFactsPage = () => {
     const navigate = useNavigate();
@@ -94,6 +95,7 @@ const formatAnimalFact = (animal) => {
 
     return (
         <div style={styles.page}>
+            <Header />
             <div style={styles.container}>
                 <button style={styles.backButton} onClick={() => navigate('/dashboard')}>← Back to Dashboard</button>
                 <h1 style={styles.title}>Pet Facts</h1>
@@ -146,9 +148,21 @@ const formatAnimalFact = (animal) => {
 };
 
 const styles = {
-    page: { minHeight: '100vh', background: 'var(--app-bg)', padding: '32px 20px' },
-    container: { maxWidth: '1100px', margin: '0 auto' },
-    backButton: { border: 'none', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', marginBottom: '14px' },
+    page: { minHeight: '100vh', background: 'var(--app-bg)' },
+    container: { maxWidth: '1100px', margin: '0 auto', padding: '32px 20px' },
+    backButton: {
+        backgroundColor: 'transparent',
+        border: 'none',
+        color: 'var(--text-primary)',
+        fontSize: '14px',
+        cursor: 'pointer',
+        marginBottom: '16px',
+        padding: '10px 20px',
+        fontWeight: '600',
+        borderRadius: '20px',
+        transition: 'all 0.3s ease',
+        display: 'inline-block'
+    },
     title: { margin: 0, color: 'var(--text-primary)' },
     subtitle: { color: 'var(--text-muted)', marginTop: '8px', marginBottom: '18px' },
     toolbar: { display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '16px' },
