@@ -63,18 +63,14 @@ data class RegisterRequest(
 )
 
 data class LoginRequest(
-    val identifier: String,
+    val username: String,
     val password: String
 )
 
 data class AuthResponse(
+    val message: String,
     val token: String,
-    val type: String,
-    val id: Long,
-    val username: String,
-    val email: String,
-    val firstName: String,
-    val lastName: String
+    val username: String
 )
 
 data class UserDto(
