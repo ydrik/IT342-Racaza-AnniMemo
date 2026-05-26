@@ -90,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val api = RetrofitClient.create { tokenManager.getToken() }
-                val response = api.login(LoginRequest(identifier, pass))
+                val response = api.login(LoginRequest(username = identifier, password = pass))
                 
                 withContext(Dispatchers.Main) {
                     binding.btnLogin.isEnabled = true

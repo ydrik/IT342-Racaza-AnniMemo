@@ -105,9 +105,16 @@ class RegisterActivity : AppCompatActivity() {
             return false
         }
 
-        if (password.length < 6) {
-            showError("Password must be at least 6 characters")
+        if (password.length < 12) {
+            showError("Password must be at least 12 characters")
             binding.tilPassword.error = "Too short"
+            return false
+        }
+
+        val passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d])\\S+$".toRegex()
+        if (!password.matches(passwordPattern)) {
+            showError("Password must include uppercase, lowercase, number, and special character")
+            binding.tilPassword.error = "Too weak"
             return false
         }
 
