@@ -27,6 +27,9 @@ public final class FragmentRemindersBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
+  public final Button btnBackToDashboard;
+
+  @NonNull
   public final ImageButton btnPickReminderDate;
 
   @NonNull
@@ -72,15 +75,16 @@ public final class FragmentRemindersBinding implements ViewBinding {
   public final TextView tvRemindersMessage;
 
   private FragmentRemindersBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull ImageButton btnPickReminderDate, @NonNull Button btnSaveReminder,
-      @NonNull CardView cvAddReminder, @NonNull EditText etReminderDueDate,
-      @NonNull EditText etReminderTitle, @NonNull LinearLayout layoutReminderFields,
-      @NonNull LinearLayout layoutRemindersEmpty, @NonNull LinearLayout layoutToggleForm,
-      @NonNull RecyclerView rvReminders, @NonNull Spinner spinnerReminderPet,
-      @NonNull Spinner spinnerReminderType, @NonNull Spinner spinnerRemindersFilter,
-      @NonNull TextView tvFormToggleIcon, @NonNull TextView tvFormToggleTitle,
-      @NonNull TextView tvRemindersMessage) {
+      @NonNull Button btnBackToDashboard, @NonNull ImageButton btnPickReminderDate,
+      @NonNull Button btnSaveReminder, @NonNull CardView cvAddReminder,
+      @NonNull EditText etReminderDueDate, @NonNull EditText etReminderTitle,
+      @NonNull LinearLayout layoutReminderFields, @NonNull LinearLayout layoutRemindersEmpty,
+      @NonNull LinearLayout layoutToggleForm, @NonNull RecyclerView rvReminders,
+      @NonNull Spinner spinnerReminderPet, @NonNull Spinner spinnerReminderType,
+      @NonNull Spinner spinnerRemindersFilter, @NonNull TextView tvFormToggleIcon,
+      @NonNull TextView tvFormToggleTitle, @NonNull TextView tvRemindersMessage) {
     this.rootView = rootView;
+    this.btnBackToDashboard = btnBackToDashboard;
     this.btnPickReminderDate = btnPickReminderDate;
     this.btnSaveReminder = btnSaveReminder;
     this.cvAddReminder = cvAddReminder;
@@ -125,6 +129,12 @@ public final class FragmentRemindersBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btn_back_to_dashboard;
+      Button btnBackToDashboard = ViewBindings.findChildViewById(rootView, id);
+      if (btnBackToDashboard == null) {
+        break missingId;
+      }
+
       id = R.id.btn_pick_reminder_date;
       ImageButton btnPickReminderDate = ViewBindings.findChildViewById(rootView, id);
       if (btnPickReminderDate == null) {
@@ -215,11 +225,11 @@ public final class FragmentRemindersBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentRemindersBinding((CoordinatorLayout) rootView, btnPickReminderDate,
-          btnSaveReminder, cvAddReminder, etReminderDueDate, etReminderTitle, layoutReminderFields,
-          layoutRemindersEmpty, layoutToggleForm, rvReminders, spinnerReminderPet,
-          spinnerReminderType, spinnerRemindersFilter, tvFormToggleIcon, tvFormToggleTitle,
-          tvRemindersMessage);
+      return new FragmentRemindersBinding((CoordinatorLayout) rootView, btnBackToDashboard,
+          btnPickReminderDate, btnSaveReminder, cvAddReminder, etReminderDueDate, etReminderTitle,
+          layoutReminderFields, layoutRemindersEmpty, layoutToggleForm, rvReminders,
+          spinnerReminderPet, spinnerReminderType, spinnerRemindersFilter, tvFormToggleIcon,
+          tvFormToggleTitle, tvRemindersMessage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

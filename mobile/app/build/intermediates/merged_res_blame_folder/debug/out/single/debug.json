@@ -4,10 +4,6 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_health_metrics.xml"
     },
     {
-        "merged": "com.g3.annimemo.app-merged_res-50:/menu_bottom_nav_menu.xml.flat",
-        "source": "com.g3.annimemo.app-main-52:/menu/bottom_nav_menu.xml"
-    },
-    {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\menu_bottom_nav_menu.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\menu\\bottom_nav_menu.xml"
     },
@@ -22,6 +18,10 @@
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\drawable_bg_app_gradient.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\drawable\\bg_app_gradient.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_settings.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_settings.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_activity_login.xml.flat",
@@ -46,6 +46,10 @@
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\drawable_bg_button_secondary.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\drawable\\bg_button_secondary.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_activity_add_pet.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/layout/activity_add_pet.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_item_pet.xml.flat",
@@ -84,12 +88,20 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\fragment_settings.xml"
     },
     {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_profile.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_profile.xml"
+    },
+    {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\drawable_bg_gradient_primary.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\drawable\\bg_gradient_primary.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_fragment_reminders.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\fragment_reminders.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_reminders.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_reminders.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\navigation_nav_graph.xml.flat",
@@ -106,10 +118,6 @@
     {
         "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_dashboard.xml.flat",
         "source": "com.g3.annimemo.app-main-52:/layout/fragment_dashboard.xml"
-    },
-    {
-        "merged": "com.g3.annimemo.app-merged_res-50:/navigation_nav_graph.xml.flat",
-        "source": "com.g3.annimemo.app-main-52:/navigation/nav_graph.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_fragment_dashboard.xml.flat",

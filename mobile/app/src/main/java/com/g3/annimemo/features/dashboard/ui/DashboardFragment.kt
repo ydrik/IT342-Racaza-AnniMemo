@@ -1,12 +1,17 @@
 package com.g3.annimemo.features.dashboard.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
 import android.text.SpannableString
 import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CalendarView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -18,10 +23,13 @@ import com.g3.annimemo.core.data.TokenManager
 import com.g3.annimemo.core.network.ActivityDto
 import com.g3.annimemo.core.network.PetDto
 import com.g3.annimemo.core.network.ReminderDto
+import com.g3.annimemo.core.network.AppointmentDto
 import com.g3.annimemo.core.network.RetrofitClient
 import com.g3.annimemo.databinding.FragmentDashboardBinding
 import com.g3.annimemo.databinding.ItemActivityBinding
 import com.g3.annimemo.databinding.ItemChecklistBinding
+import com.g3.annimemo.features.pets.ui.AddPetActivity
+import com.g3.annimemo.features.pets.ui.HealthMetricsActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,6 +48,7 @@ class DashboardFragment : Fragment() {
     private var petsList = listOf<PetDto>()
     private var remindersList = listOf<ReminderDto>()
     private var activitiesList = listOf<ActivityDto>()
+    private var appointmentsList = listOf<AppointmentDto>()
     
     // Checklist for today
     private var todayChecklist = mutableListOf<ChecklistItem>()
@@ -96,6 +105,72 @@ class DashboardFragment : Fragment() {
         // Fact of the day card click -> Explore Breeds
         binding.cvFactCard.setOnClickListener {
             findNavController().navigate(R.id.navigation_explore_breeds)
+        }
+
+        // Quick Actions clicks
+        binding.btnActionPets.setOnClickListener {
+            findNavController().navigate(R.id.navigation_pets)
+        }
+        binding.btnActionHealth.setOnClickListener {
+            val pets = localStorageManager.getPets()
+            if (pets.isNotEmpty()) {
+                val intent = Intent(requireContext(), HealthMetricsActivity::class.java).apply {
+                    putExtra("EXTRA_PET_ID", pets[0].id)
+                }
+                startActivity(intent)
+            } else {
+                Toast.makeText(requireContext(), "Add a pet first to view health trends!", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.navigation_pets)
+            }
+        }
+        binding.btnActionBreeds.setOnClickListener {
+            findNavController().navigate(R.id.navigation_explore_breeds)
+        }
+        binding.btnActionReminders.setOnClickListener {
+            findNavController().navigate(R.id.navigation_reminders)
+        }
+        binding.btnActionAppointments.setOnClickListener {
+            findNavController().navigate(R.id.navigation_appointments)
+        }
+        binding.btnActionProfile.setOnClickListener {
+            findNavController().navigate(R.id.navigation_profile)
+        }
+
+        // Quick Adjustments Settings click
+        binding.btnActionSettings.setOnClickListener {
+            findNavController().navigate(R.id.navigation_settings)
+        }
+
+        // Calendar Date Selected Change Listener
+        binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            val cal = Calendar.getInstance()
+            cal.set(year, month, dayOfMonth)
+            val dateKey = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(cal.time)
+            loadCalendarAgendaForDate(dateKey)
+        }
+
+        // Google-style Search Bar listener
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString().trim()
+                if (query.isNotEmpty()) {
+                    binding.btnClearSearch.visibility = View.VISIBLE
+                    binding.cvSearchSuggestions.visibility = View.VISIBLE
+                    populateSuggestionsOverlay(query)
+                    filterDashboardByQuery(query)
+                } else {
+                    binding.btnClearSearch.visibility = View.GONE
+                    binding.cvSearchSuggestions.visibility = View.GONE
+                    resetDashboardFilters()
+                }
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        // Clear search text view click
+        binding.btnClearSearch.setOnClickListener {
+            binding.etSearch.setText("")
         }
     }
 
@@ -163,10 +238,26 @@ class DashboardFragment : Fragment() {
                 localStorageManager.getActivities()
             }
 
+            // 5. Fetch Appointments
+            val appointments = try {
+                val api = RetrofitClient.create { token }
+                val response = api.getAppointments()
+                if (response.isSuccessful && response.body() != null) {
+                    val list = response.body()!!
+                    localStorageManager.saveAppointments(list)
+                    list
+                } else {
+                    localStorageManager.getAppointments()
+                }
+            } catch (e: Exception) {
+                localStorageManager.getAppointments()
+            }
+
             withContext(Dispatchers.Main) {
                 petsList = pets
                 remindersList = reminders
                 activitiesList = activities
+                appointmentsList = appointments
                 
                 // Welcome message
                 binding.tvWelcomeTitle.text = "Welcome back, ${profile.firstName ?: profile.username}! 👋"
@@ -181,11 +272,20 @@ class DashboardFragment : Fragment() {
                 populateChecklistUI()
                 populateActivitiesUI()
                 populateFactCard()
+
+                // New lists bindings
+                populateDueSoonUI()
+                populateAppointmentsUI()
+                populateHealthTrendsUI()
+                populateQuickAdjustmentsUI()
+
+                // Default Calendar Agenda selection (Today)
+                val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                loadCalendarAgendaForDate(todayStr)
             }
         }
     }
 
-    // 1. Calculate Activity Streak
     private fun calculateActivityStreak(): Int {
         val allActivities = localStorageManager.getActivities()
         if (allActivities.isEmpty()) return 0
@@ -260,7 +360,6 @@ class DashboardFragment : Fragment() {
                 )
             )
 
-            // Re-fetch activities from disk
             val nextActivities = localStorageManager.getActivities()
             withContext(Dispatchers.Main) {
                 activitiesList = nextActivities
@@ -271,7 +370,6 @@ class DashboardFragment : Fragment() {
     }
 
     private fun updateDashboardWidgets() {
-        // Streak widget
         val streak = calculateActivityStreak()
         binding.tvStreakValue.text = "$streak day${if (streak != 1) "s" else ""}"
         
@@ -283,7 +381,6 @@ class DashboardFragment : Fragment() {
             binding.btnStreakCheckin.isEnabled = true
         }
 
-        // Care Score widget
         val completedCount = todayChecklist.count { it.done }
         val totalCount = todayChecklist.size
         val score = if (totalCount == 0) 0 else (completedCount * 100 / totalCount)
@@ -291,7 +388,6 @@ class DashboardFragment : Fragment() {
         binding.tvCareScoreValue.text = "$score%"
         binding.pbCareScore.progress = score
 
-        // Due soon reminders count in 7 days
         val settings = localStorageManager.getSettings()
         val daysLimit = settings.reminderWindowDays
         val calLimit = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, daysLimit) }
@@ -308,7 +404,6 @@ class DashboardFragment : Fragment() {
         binding.tvDueSoonValue.text = "$dueCount task${if (dueCount != 1) "s" else ""}"
     }
 
-    // 2. Checklist storage key date dependent
     private fun getChecklistDateKey(): String {
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
@@ -327,7 +422,6 @@ class DashboardFragment : Fragment() {
                 }
             }
         } else {
-            // Generate default tasks for pets
             if (petsList.isEmpty()) {
                 todayChecklist.add(ChecklistItem("default-addpet", "🐾 Add your first pet profile to get started", false))
             } else {
@@ -337,7 +431,6 @@ class DashboardFragment : Fragment() {
                 }
             }
 
-            // Generate tasks for due reminders
             remindersList.take(3).forEach { reminder ->
                 if (!reminder.completed) {
                     todayChecklist.add(ChecklistItem("reminder-${reminder.id}-${System.currentTimeMillis()}", "⏰ Complete reminder: ${reminder.title}", false))
@@ -417,7 +510,7 @@ class DashboardFragment : Fragment() {
         populateChecklistUI()
     }
 
-    private fun populateChecklistUI() {
+    private fun populateChecklistUI(list: List<ChecklistItem> = todayChecklist) {
         binding.checklistContainer.removeAllViews()
         
         val completedCount = todayChecklist.count { it.done }
@@ -425,9 +518,9 @@ class DashboardFragment : Fragment() {
         binding.tvChecklistCount.text = "$completedCount/$totalCount done"
         binding.pbChecklist.progress = if (totalCount == 0) 0 else (completedCount * 100 / totalCount)
 
-        if (todayChecklist.isEmpty()) {
+        if (list.isEmpty()) {
             val emptyText = TextView(requireContext()).apply {
-                text = "No checklist tasks for today. Add one above! ✨"
+                text = "No matching checklist tasks."
                 setTextColor(resources.getColor(R.color.text_muted, null))
                 setPadding(0, 16, 0, 16)
                 textSize = 14f
@@ -438,10 +531,9 @@ class DashboardFragment : Fragment() {
             return
         }
 
-        todayChecklist.forEach { item ->
+        list.forEach { item ->
             val rowBinding = ItemChecklistBinding.inflate(layoutInflater, binding.checklistContainer, false)
             
-            // Check state
             rowBinding.tvTaskCheck.text = if (item.done) "✅" else "⬜"
             
             if (item.done) {
@@ -454,15 +546,12 @@ class DashboardFragment : Fragment() {
                 rowBinding.tvTaskLabel.alpha = 1.0f
             }
 
-            // Click row to toggle complete
             rowBinding.root.setOnClickListener {
                 toggleChecklistItem(item)
             }
             rowBinding.tvTaskCheck.setOnClickListener {
                 toggleChecklistItem(item)
             }
-
-            // Click delete
             rowBinding.tvTaskDelete.setOnClickListener {
                 deleteChecklistItem(item)
             }
@@ -471,12 +560,12 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun populateActivitiesUI() {
+    private fun populateActivitiesUI(list: List<ActivityDto> = activitiesList) {
         binding.activitiesContainer.removeAllViews()
 
-        if (activitiesList.isEmpty()) {
+        if (list.isEmpty()) {
             val emptyText = TextView(requireContext()).apply {
-                text = "No recent activities"
+                text = "No matching activities"
                 setTextColor(resources.getColor(R.color.text_muted, null))
                 setPadding(0, 16, 0, 16)
                 textSize = 14f
@@ -486,8 +575,7 @@ class DashboardFragment : Fragment() {
             return
         }
 
-        // Display up to 8 sorted activities (like the web app)
-        activitiesList.take(8).forEach { activity ->
+        list.take(8).forEach { activity ->
             val rowBinding = ItemActivityBinding.inflate(layoutInflater, binding.activitiesContainer, false)
             rowBinding.tvActivityIcon.text = activity.icon
             rowBinding.tvActivityPetName.text = activity.petName ?: "Activity logged"
@@ -518,11 +606,9 @@ class DashboardFragment : Fragment() {
     }
 
     private fun populateFactCard() {
-        // Pick a premium fact based on settings
         val settings = localStorageManager.getSettings()
         binding.tvFactSpecies.text = "🧬 Species: ${settings.defaultFactSpecies.uppercase(Locale.getDefault())}"
         
-        // Static high-quality offline facts to keep it wowed
         val defaultFactText = when (settings.defaultFactSpecies.lowercase(Locale.getDefault())) {
             "dog" -> "Dogs have a sense of time. It's been proven they know the difference between one hour and four! 🐕\n💡 \"Happiness is a warm puppy.\" — Charles M. Schulz"
             "cat" -> "Cats share 95.6% of their genetic makeup with tigers. They also display tiger behaviors such as scent marking! 🐱\n💡 \"Time spent with cats is never wasted.\" — Sigmund Freud"
@@ -531,6 +617,298 @@ class DashboardFragment : Fragment() {
         }
         
         binding.tvFactText.text = defaultFactText
+    }
+
+    // Google-style Search suggestions dynamically loaded
+    private fun populateSuggestionsOverlay(query: String) {
+        binding.suggestionsContainer.removeAllViews()
+        val keyword = query.lowercase(Locale.getDefault())
+
+        val suggestions = mutableListOf<SearchSuggestion>()
+
+        // 1. Explore breeds matching suggestion
+        if ("dog".contains(keyword) || "cat".contains(keyword) || "rabbit".contains(keyword) || keyword.length > 2) {
+            suggestions.add(SearchSuggestion("🔍 Explore breeds details for: \"$query\"", "breeds", R.id.navigation_explore_breeds))
+        }
+
+        // 2. Navigation quick match items
+        if ("add pet".contains(keyword) || "new pet".contains(keyword)) {
+            suggestions.add(SearchSuggestion("🐾 Quick Action: Add New Pet Profile", "add_pet", 0))
+        }
+        if ("appointment".contains(keyword) || "vet".contains(keyword) || "doctor".contains(keyword)) {
+            suggestions.add(SearchSuggestion("📅 Quick Action: Schedule Vet Appointment", "appointments", R.id.navigation_appointments))
+        }
+        if ("reminder".contains(keyword) || "medication".contains(keyword) || "care".contains(keyword)) {
+            suggestions.add(SearchSuggestion("⏰ Quick Action: Create Care Reminder", "reminders", R.id.navigation_reminders))
+        }
+        if ("profile".contains(keyword) || "account".contains(keyword) || "avatar".contains(keyword)) {
+            suggestions.add(SearchSuggestion("👤 Quick Action: Edit Profile & Password", "profile", R.id.navigation_profile))
+        }
+
+        if (suggestions.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = "No suggestions. Type 'pet', 'reminder', 'vet', or 'profile'..."
+                setTextColor(resources.getColor(R.color.text_muted, null))
+                setPadding(16, 12, 16, 12)
+                textSize = 13f
+            }
+            binding.suggestionsContainer.addView(emptyTv)
+            return
+        }
+
+        suggestions.forEach { item ->
+            val cell = TextView(requireContext()).apply {
+                text = item.label
+                setTextColor(resources.getColor(R.color.text_primary, null))
+                setPadding(16, 14, 16, 14)
+                textSize = 14f
+                isClickable = true
+                focusable = View.FOCUSABLE
+                setBackgroundResource(android.R.drawable.list_selector_background)
+            }
+            cell.setOnClickListener {
+                binding.etSearch.setText("") // Clear
+                if (item.actionKey == "add_pet") {
+                    startActivity(Intent(requireContext(), AddPetActivity::class.java))
+                } else if (item.destinationId > 0) {
+                    findNavController().navigate(item.destinationId)
+                }
+            }
+            binding.suggestionsContainer.addView(cell)
+        }
+    }
+
+    private data class SearchSuggestion(
+        val label: String,
+        val actionKey: String,
+        val destinationId: Int
+    )
+
+    private fun filterDashboardByQuery(query: String) {
+        val keyword = query.lowercase(Locale.getDefault())
+        
+        // Filter checklist
+        val filteredChecklist = todayChecklist.filter {
+            it.label.lowercase(Locale.getDefault()).contains(keyword)
+        }
+        populateChecklistUI(filteredChecklist)
+
+        // Filter activities
+        val filteredActivities = activitiesList.filter {
+            val matchesPet = it.petName?.lowercase(Locale.getDefault())?.contains(keyword) ?: false
+            val matchesDesc = it.description.lowercase(Locale.getDefault()).contains(keyword)
+            matchesPet || matchesDesc
+        }
+        populateActivitiesUI(filteredActivities)
+    }
+
+    private fun resetDashboardFilters() {
+        populateChecklistUI()
+        populateActivitiesUI()
+    }
+
+    // Calendar Selected Day agenda logic
+    private fun loadCalendarAgendaForDate(dateKey: String) {
+        binding.calendarAgendaContainer.removeAllViews()
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedSelectedDate = try {
+            val parsed = sdf.parse(dateKey)
+            parsed?.let { SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(it) } ?: dateKey
+        } catch (e: Exception) {
+            dateKey
+        }
+
+        val agendaItems = mutableListOf<AgendaItem>()
+
+        // 1. Check reminders due on selected day
+        remindersList.forEach { reminder ->
+            if (reminder.dueDate == dateKey) {
+                agendaItems.add(
+                    AgendaItem(
+                        title = reminder.title,
+                        subtitle = "Companion: ${reminder.petName}",
+                        type = "Reminder",
+                        icon = "⏰"
+                    )
+                )
+            }
+        }
+
+        // 2. Check appointments scheduled on selected day
+        appointmentsList.forEach { appt ->
+            if (appt.dateTime.startsWith(dateKey)) {
+                agendaItems.add(
+                    AgendaItem(
+                        title = appt.reason,
+                        subtitle = "Companion: ${appt.petName}",
+                        type = "Appointment",
+                        icon = "🏥"
+                    )
+                )
+            }
+        }
+
+        // 3. Check activities completed on selected day
+        activitiesList.forEach { act ->
+            try {
+                val actParsed = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(act.timestamp)
+                val actKey = actParsed?.let { sdf.format(it) }
+                if (actKey == dateKey) {
+                    agendaItems.add(
+                        AgendaItem(
+                            title = act.description,
+                            subtitle = act.petName ?: "Care Event",
+                            type = "Activity",
+                            icon = act.icon ?: "✅"
+                        )
+                    )
+                }
+            } catch (e: Exception) {}
+        }
+
+        if (agendaItems.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = "No events on $formattedSelectedDate."
+                setTextColor(resources.getColor(R.color.text_muted, null))
+                setPadding(0, 12, 0, 12)
+                textSize = 13f
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                typeface = android.graphics.Typeface.defaultFromStyle(android.graphics.Typeface.ITALIC)
+            }
+            binding.calendarAgendaContainer.addView(emptyTv)
+            return
+        }
+
+        agendaItems.forEach { item ->
+            val row = LayoutInflater.from(requireContext()).inflate(R.layout.item_activity, binding.calendarAgendaContainer, false)
+            row.findViewById<TextView>(R.id.tv_activity_icon).text = item.icon
+            row.findViewById<TextView>(R.id.tv_activity_pet_name).text = item.title
+            row.findViewById<TextView>(R.id.tv_activity_description).text = item.subtitle
+            row.findViewById<TextView>(R.id.tv_activity_timestamp).text = item.type
+            binding.calendarAgendaContainer.addView(row)
+        }
+    }
+
+    private data class AgendaItem(
+        val title: String,
+        val subtitle: String,
+        val type: String,
+        val icon: String
+    )
+
+    // Dynamic Lists Population
+    private fun populateDueSoonUI() {
+        binding.dueSoonContainer.removeAllViews()
+
+        val settings = localStorageManager.getSettings()
+        val daysLimit = settings.reminderWindowDays
+        val calLimit = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, daysLimit) }
+        
+        val dueList = remindersList.filter { 
+            if (it.completed) return@filter false
+            val dueDateStr = it.dueDate ?: return@filter false
+            try {
+                val dueDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(dueDateStr)
+                dueDate != null && dueDate.before(calLimit.time) && dueDate.after(Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }.time)
+            } catch (e: Exception) {
+                false
+            }
+        }
+
+        if (dueList.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = "Nothing urgent right now."
+                setTextColor(resources.getColor(R.color.text_muted, null))
+                setPadding(0, 12, 0, 12)
+                textSize = 13f
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+            }
+            binding.dueSoonContainer.addView(emptyTv)
+            return
+        }
+
+        dueList.forEach { reminder ->
+            val row = LayoutInflater.from(requireContext()).inflate(R.layout.item_reminder, binding.dueSoonContainer, false)
+            row.findViewById<TextView>(R.id.tv_reminder_title).text = reminder.title
+            row.findViewById<TextView>(R.id.tv_reminder_pet_badge).text = reminder.petName
+            row.findViewById<TextView>(R.id.tv_reminder_due_tag).text = reminder.dueDate ?: "No date"
+            binding.dueSoonContainer.addView(row)
+        }
+    }
+
+    private fun populateAppointmentsUI() {
+        binding.appointmentsContainer.removeAllViews()
+
+        val upcoming = appointmentsList.filter {
+            val dateStr = it.dateTime
+            if (dateStr.isEmpty()) true
+            else {
+                try {
+                    // Try parsing start of date
+                    val apptDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(dateStr)
+                    apptDate != null && apptDate.after(Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }.time)
+                } catch (e: Exception) {
+                    true
+                }
+            }
+        }
+
+        if (upcoming.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = "No vet appointments scheduled."
+                setTextColor(resources.getColor(R.color.text_muted, null))
+                setPadding(0, 12, 0, 12)
+                textSize = 13f
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+            }
+            binding.appointmentsContainer.addView(emptyTv)
+            return
+        }
+
+        upcoming.forEach { appt ->
+            val row = LayoutInflater.from(requireContext()).inflate(R.layout.item_appointment, binding.appointmentsContainer, false)
+            row.findViewById<TextView>(R.id.tv_appointment_reason).text = appt.reason
+            row.findViewById<TextView>(R.id.tv_appointment_pet_badge).text = "Companion: ${appt.petName}"
+            row.findViewById<TextView>(R.id.tv_appointment_date).text = "📅 ${appt.dateTime}"
+            binding.appointmentsContainer.addView(row)
+        }
+    }
+
+    private fun populateHealthTrendsUI() {
+        binding.healthTrendsContainer.removeAllViews()
+
+        // Filter activities that represent dynamic logged health metrics (weight logs, vaccinations, medications, vet visits)
+        val healthLogs = activitiesList.filter {
+            it.type == "weight" || it.type == "vaccination" || it.type == "medication" || it.type == "vetVisit" || it.type == "profileUpdate"
+        }
+
+        if (healthLogs.isEmpty()) {
+            val emptyTv = TextView(requireContext()).apply {
+                text = "No health records logged yet."
+                setTextColor(resources.getColor(R.color.text_muted, null))
+                setPadding(0, 12, 0, 12)
+                textSize = 13f
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+            }
+            binding.healthTrendsContainer.addView(emptyTv)
+            return
+        }
+
+        healthLogs.take(5).forEach { log ->
+            val row = LayoutInflater.from(requireContext()).inflate(R.layout.item_activity, binding.healthTrendsContainer, false)
+            row.findViewById<TextView>(R.id.tv_activity_icon).text = log.icon
+            row.findViewById<TextView>(R.id.tv_activity_pet_name).text = log.petName ?: "Companion"
+            row.findViewById<TextView>(R.id.tv_activity_description).text = log.description
+            row.findViewById<TextView>(R.id.tv_activity_timestamp).text = formatActivityTimestamp(log.timestamp)
+            binding.healthTrendsContainer.addView(row)
+        }
+    }
+
+    private fun populateQuickAdjustmentsUI() {
+        val settings = localStorageManager.getSettings()
+        binding.tvAdjustmentsWindow.text = "Reminder window: ${settings.reminderWindowDays} day(s)"
+        binding.tvAdjustmentsSpecies.text = "Fact default species: ${settings.defaultFactSpecies.capitalize(Locale.getDefault())}"
     }
 
     override fun onDestroyView() {

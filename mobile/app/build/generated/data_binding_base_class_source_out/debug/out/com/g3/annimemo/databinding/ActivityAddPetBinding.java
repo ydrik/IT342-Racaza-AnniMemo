@@ -33,12 +33,6 @@ public final class ActivityAddPetBinding implements ViewBinding {
   public final Button btnSavePet;
 
   @NonNull
-  public final EditText etPetBreed;
-
-  @NonNull
-  public final EditText etPetColor;
-
-  @NonNull
   public final EditText etPetDob;
 
   @NonNull
@@ -49,6 +43,12 @@ public final class ActivityAddPetBinding implements ViewBinding {
 
   @NonNull
   public final EditText etPetWeight;
+
+  @NonNull
+  public final Spinner spinnerBreed;
+
+  @NonNull
+  public final Spinner spinnerColor;
 
   @NonNull
   public final Spinner spinnerGender;
@@ -63,21 +63,21 @@ public final class ActivityAddPetBinding implements ViewBinding {
   public final TextView tvFormTitle;
 
   private ActivityAddPetBinding(@NonNull NestedScrollView rootView, @NonNull Button btnBackToPets,
-      @NonNull ImageButton btnPickDate, @NonNull Button btnSavePet, @NonNull EditText etPetBreed,
-      @NonNull EditText etPetColor, @NonNull EditText etPetDob, @NonNull EditText etPetName,
-      @NonNull EditText etPetNotes, @NonNull EditText etPetWeight, @NonNull Spinner spinnerGender,
+      @NonNull ImageButton btnPickDate, @NonNull Button btnSavePet, @NonNull EditText etPetDob,
+      @NonNull EditText etPetName, @NonNull EditText etPetNotes, @NonNull EditText etPetWeight,
+      @NonNull Spinner spinnerBreed, @NonNull Spinner spinnerColor, @NonNull Spinner spinnerGender,
       @NonNull Spinner spinnerSpecies, @NonNull TextView tvFormMessage,
       @NonNull TextView tvFormTitle) {
     this.rootView = rootView;
     this.btnBackToPets = btnBackToPets;
     this.btnPickDate = btnPickDate;
     this.btnSavePet = btnSavePet;
-    this.etPetBreed = etPetBreed;
-    this.etPetColor = etPetColor;
     this.etPetDob = etPetDob;
     this.etPetName = etPetName;
     this.etPetNotes = etPetNotes;
     this.etPetWeight = etPetWeight;
+    this.spinnerBreed = spinnerBreed;
+    this.spinnerColor = spinnerColor;
     this.spinnerGender = spinnerGender;
     this.spinnerSpecies = spinnerSpecies;
     this.tvFormMessage = tvFormMessage;
@@ -129,18 +129,6 @@ public final class ActivityAddPetBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.et_pet_breed;
-      EditText etPetBreed = ViewBindings.findChildViewById(rootView, id);
-      if (etPetBreed == null) {
-        break missingId;
-      }
-
-      id = R.id.et_pet_color;
-      EditText etPetColor = ViewBindings.findChildViewById(rootView, id);
-      if (etPetColor == null) {
-        break missingId;
-      }
-
       id = R.id.et_pet_dob;
       EditText etPetDob = ViewBindings.findChildViewById(rootView, id);
       if (etPetDob == null) {
@@ -162,6 +150,18 @@ public final class ActivityAddPetBinding implements ViewBinding {
       id = R.id.et_pet_weight;
       EditText etPetWeight = ViewBindings.findChildViewById(rootView, id);
       if (etPetWeight == null) {
+        break missingId;
+      }
+
+      id = R.id.spinner_breed;
+      Spinner spinnerBreed = ViewBindings.findChildViewById(rootView, id);
+      if (spinnerBreed == null) {
+        break missingId;
+      }
+
+      id = R.id.spinner_color;
+      Spinner spinnerColor = ViewBindings.findChildViewById(rootView, id);
+      if (spinnerColor == null) {
         break missingId;
       }
 
@@ -190,7 +190,7 @@ public final class ActivityAddPetBinding implements ViewBinding {
       }
 
       return new ActivityAddPetBinding((NestedScrollView) rootView, btnBackToPets, btnPickDate,
-          btnSavePet, etPetBreed, etPetColor, etPetDob, etPetName, etPetNotes, etPetWeight,
+          btnSavePet, etPetDob, etPetName, etPetNotes, etPetWeight, spinnerBreed, spinnerColor,
           spinnerGender, spinnerSpecies, tvFormMessage, tvFormTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);

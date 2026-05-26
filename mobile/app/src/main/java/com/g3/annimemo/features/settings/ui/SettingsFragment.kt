@@ -13,6 +13,9 @@ import com.g3.annimemo.core.data.SettingsDto
 import com.g3.annimemo.databinding.FragmentSettingsBinding
 import java.util.Locale
 
+import androidx.navigation.fragment.findNavController
+import com.g3.annimemo.R
+
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
@@ -45,6 +48,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupUI() {
+        binding.btnBackToDashboard.setOnClickListener {
+            findNavController().navigate(R.id.navigation_dashboard)
+        }
+
         // SeekBar days changed listener
         binding.sbReminderDays.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

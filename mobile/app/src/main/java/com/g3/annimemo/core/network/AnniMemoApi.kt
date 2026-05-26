@@ -16,6 +16,12 @@ interface AnniMemoApi {
     @GET("users/profile")
     suspend fun getUserProfile(): Response<UserProfileDto>
 
+    @PUT("users/profile")
+    suspend fun updateUserProfile(@Body profile: UserProfileDto): Response<UserProfileDto>
+
+    @PUT("users/password")
+    suspend fun changePassword(@Body request: PasswordChangeRequest): Response<Unit>
+
     @GET("pets")
     suspend fun getPets(): Response<List<PetDto>>
 
@@ -86,5 +92,10 @@ data class UserProfileDto(
     val lastName: String?,
     val email: String,
     val role: String? = null
+)
+
+data class PasswordChangeRequest(
+    val currentPassword: String,
+    val newPassword: String
 )
 

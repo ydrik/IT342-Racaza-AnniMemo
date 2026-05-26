@@ -127,18 +127,14 @@
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/et_pet_breed"
+                <Spinner
+                    android:id="@+id/spinner_breed"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:layout_marginTop="6dp"
                     android:background="@drawable/bg_button_secondary"
                     android:backgroundTint="@color/card_bg_surface"
-                    android:hint="e.g. Golden Retriever"
-                    android:inputType="text"
-                    android:paddingHorizontal="12dp"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:paddingHorizontal="12dp" />
 
                 <!-- 4. Gender Field -->
                 <TextView
@@ -234,18 +230,14 @@
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/et_pet_color"
+                <Spinner
+                    android:id="@+id/spinner_color"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:layout_marginTop="6dp"
                     android:background="@drawable/bg_button_secondary"
                     android:backgroundTint="@color/card_bg_surface"
-                    android:hint="e.g. Golden, Brown"
-                    android:inputType="text"
-                    android:paddingHorizontal="12dp"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp" />
+                    android:paddingHorizontal="12dp" />
 
                 <!-- 8. Notes Field -->
                 <TextView

@@ -24,6 +24,9 @@ public final class FragmentSettingsBinding implements ViewBinding {
   private final NestedScrollView rootView;
 
   @NonNull
+  public final Button btnBackToDashboard;
+
+  @NonNull
   public final Button btnSaveSettings;
 
   @NonNull
@@ -39,10 +42,11 @@ public final class FragmentSettingsBinding implements ViewBinding {
   public final TextView tvSettingsDaysLabel;
 
   private FragmentSettingsBinding(@NonNull NestedScrollView rootView,
-      @NonNull Button btnSaveSettings, @NonNull SeekBar sbReminderDays,
-      @NonNull Spinner spinnerSettingsFact, @NonNull SwitchCompat swCompact,
-      @NonNull TextView tvSettingsDaysLabel) {
+      @NonNull Button btnBackToDashboard, @NonNull Button btnSaveSettings,
+      @NonNull SeekBar sbReminderDays, @NonNull Spinner spinnerSettingsFact,
+      @NonNull SwitchCompat swCompact, @NonNull TextView tvSettingsDaysLabel) {
     this.rootView = rootView;
+    this.btnBackToDashboard = btnBackToDashboard;
     this.btnSaveSettings = btnSaveSettings;
     this.sbReminderDays = sbReminderDays;
     this.spinnerSettingsFact = spinnerSettingsFact;
@@ -77,6 +81,12 @@ public final class FragmentSettingsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btn_back_to_dashboard;
+      Button btnBackToDashboard = ViewBindings.findChildViewById(rootView, id);
+      if (btnBackToDashboard == null) {
+        break missingId;
+      }
+
       id = R.id.btn_save_settings;
       Button btnSaveSettings = ViewBindings.findChildViewById(rootView, id);
       if (btnSaveSettings == null) {
@@ -107,8 +117,8 @@ public final class FragmentSettingsBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentSettingsBinding((NestedScrollView) rootView, btnSaveSettings,
-          sbReminderDays, spinnerSettingsFact, swCompact, tvSettingsDaysLabel);
+      return new FragmentSettingsBinding((NestedScrollView) rootView, btnBackToDashboard,
+          btnSaveSettings, sbReminderDays, spinnerSettingsFact, swCompact, tvSettingsDaysLabel);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
