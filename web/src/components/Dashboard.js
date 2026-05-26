@@ -66,13 +66,13 @@ const Dashboard = () => {
         const token = localStorage.getItem('token');
         if (!token) {
             // Activity Diagram: If not authenticated, redirect to Login
-            navigate('/login'); 
+            navigate('/login');
         } else {
             setDashboardSettings(getDashboardSettings());
             fetchDashboardData();
         }
-    // Intentional one-time auth/bootstrap check for this route.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // Intentional one-time auth/bootstrap check for this route.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate]);
 
     useEffect(() => {
@@ -180,7 +180,7 @@ const Dashboard = () => {
                 const now = new Date();
                 const limit = new Date();
                 limit.setDate(now.getDate() + (settings.reminderWindowDays || 7));
-                
+
                 const filtered = localReminders.filter(r => {
                     if (r.completed) return false;
                     const due = new Date(r.dueDate);
@@ -237,7 +237,7 @@ const Dashboard = () => {
 
         const apiKey = 'umq5Kw3JhzWzxy3FbstB5hRFIwJargSdSta5PnyL';
         const COMMON_PETS = ['dog', 'cat', 'rabbit', 'hamster', 'goldfish', 'parrot', 'iguana', 'ferret', 'turtle', 'chameleon'];
-        
+
         let termIndex = factSpecies === 'any' ? (new Date().getDate() % COMMON_PETS.length) : COMMON_PETS.indexOf(factSpecies);
         if (termIndex === -1) termIndex = 0;
 
@@ -247,22 +247,22 @@ const Dashboard = () => {
         for (let i = 0; i < COMMON_PETS.length; i++) {
             const index = (termIndex + i) % COMMON_PETS.length;
             const currentTerm = COMMON_PETS[index];
-            
+
             try {
                 const url = `https://api.api-ninjas.com/v1/animals?name=${currentTerm}`;
                 const response = await axios.get(url, {
                     headers: { 'X-Api-Key': apiKey }
                 });
-                
+
                 if (response.data && response.data.length > 0) {
                     // Filter candidates that have all critical fields populated
-                    const candidate = response.data.find(a => 
-                        a.name && 
-                        a.taxonomy?.scientific_name && 
-                        a.characteristics?.lifespan && 
+                    const candidate = response.data.find(a =>
+                        a.name &&
+                        a.taxonomy?.scientific_name &&
+                        a.characteristics?.lifespan &&
                         a.characteristics?.diet
                     );
-                    
+
                     if (candidate) {
                         animal = candidate;
                         break;
@@ -314,14 +314,14 @@ const Dashboard = () => {
             const diet = animal.characteristics?.diet || "";
             const distinctive = animal.characteristics?.most_distinctive_feature || animal.characteristics?.distinctive_feature || "";
             const temperament = animal.characteristics?.temperament || animal.characteristics?.group_behavior || "";
-            
+
             let factParts = [];
             if (distinctive) factParts.push(`Distinctive feature: ${distinctive}.`);
             if (temperament) factParts.push(`Temperament: ${temperament}.`);
             if (lifespan) factParts.push(`Average lifespan: ${lifespan}.`);
             if (diet) factParts.push(`Diet: ${diet}.`);
-            
-            const factText = factParts.length > 0 
+
+            const factText = factParts.length > 0
                 ? `The ${name} (${scientific || 'scientific name pending'}) is a fascinating animal. ${factParts.join(' ')}`
                 : `The ${name} (${scientific || 'scientific name pending'}) is known for its unique characteristics and roles in human households and environments.`;
 
@@ -346,26 +346,41 @@ const Dashboard = () => {
     };
 
     const calculateActivityStreak = (activities) => {
-        if (!activities.length) {
+        if (!activities || !activities.length) {
             return 0;
         }
 
+        const getLocalDateString = (dateInput) => {
+            const d = new Date(dateInput);
+            if (Number.isNaN(d.getTime())) return null;
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        };
+
         const uniqueDays = new Set(
             activities
-                .map((activity) => {
-                    const date = new Date(activity.timestamp || 0);
-                    if (Number.isNaN(date.getTime())) {
-                        return null;
-                    }
-                    return date.toISOString().split('T')[0];
-                })
+                .map((activity) => getLocalDateString(activity.timestamp))
                 .filter(Boolean)
         );
 
+        const todayKey = getLocalDateString(new Date());
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayKey = getLocalDateString(yesterday);
+
+        // If no activity today and no activity yesterday, streak is 0
+        if (!uniqueDays.has(todayKey) && !uniqueDays.has(yesterdayKey)) {
+            return 0;
+        }
+
+        // Start counting back from the most recent active day (today or yesterday)
+        let cursor = uniqueDays.has(todayKey) ? new Date() : yesterday;
         let streak = 0;
-        const cursor = new Date();
+
         while (true) {
-            const key = cursor.toISOString().split('T')[0];
+            const key = getLocalDateString(cursor);
             if (!uniqueDays.has(key)) {
                 break;
             }
@@ -650,283 +665,287 @@ const Dashboard = () => {
                                 navigate('/pets');
                             }
                         }} style={styles.sidebarButton}>📈 Health Trends</button>
+                        <button onClick={() => navigate('/breeds')} style={styles.sidebarButton}>🔍 Explore Breeds</button>
                         <button onClick={() => navigate('/facts')} style={styles.sidebarButton}>📚 Pet Facts</button>
                         <button onClick={() => navigate('/settings')} style={styles.sidebarButton}>⚙️ Settings</button>
                     </aside>
 
                     <div style={dashboardSettings.compactDashboard ? styles.mainCanvasCompact : styles.mainCanvas}>
-                {/* Welcome Section */}
-                <div style={styles.welcomeSection}>
-                    <h1 style={welcomeTitleStyle}>
-                        Welcome back, {user?.firstName || user?.name}! 👋
-                    </h1>
-                    <p style={welcomeSubtitleStyle}>
-                        Here's what's happening with your pets today
-                    </p>
-                    <div style={styles.welcomeMetaRow}>
-                        <span style={styles.welcomeMetaChip}>Pets: {pets.length}</span>
-                        <span style={styles.welcomeMetaChip}>Due Soon: {dueSoonReminders.length}</span>
-                        <span style={styles.welcomeMetaChip}>Streak: {activityStreak}d</span>
-                    </div>
-                </div>
-
-                <div style={styles.hookStrip}>
-                    <div style={styles.hookCard}>
-                        <div style={styles.hookLabel}>Activity Streak</div>
-                        <div style={styles.hookValue}>{activityStreak} day{activityStreak !== 1 ? 's' : ''}</div>
-                        <div style={styles.hookHint}>Keep logging updates daily.</div>
-                    </div>
-                    <div style={styles.hookCard}>
-                        <div style={styles.hookLabel}>Care Score</div>
-                        <div style={styles.hookValue}>{careScore}%</div>
-                        <div style={styles.scoreBar}>
-                            <div style={{ ...styles.scoreFill, width: `${careScore}%` }}></div>
-                        </div>
-                    </div>
-                    <div style={styles.hookCard}>
-                        <div style={styles.hookLabel}>Due in 7 Days</div>
-                        <div style={styles.hookValue}>{dueSoonReminders.length}</div>
-                        <button onClick={() => navigate('/reminders')} style={styles.hookActionButton}>
-                            View reminders
-                        </button>
-                    </div>
-                </div>
-
-                <div style={styles.factCard}>
-                    <div style={styles.factHeader}>
-                        <h3 style={styles.factTitle}>Fact of the Day</h3>
-                        <button onClick={() => navigate('/facts')} style={styles.factMoreButton}>More facts</button>
-                    </div>
-                    {factOfDay ? (
-                        <div style={styles.factContentLayout}>
-                            <div style={styles.factGrid}>
-                                <div style={styles.factMiniCard}>
-                                    <span style={styles.factMiniLabel}>🧬 Species</span>
-                                    <span style={styles.factMiniValue}>{factOfDay.name || 'Pet'}</span>
-                                </div>
-                                <div style={styles.factMiniCard}>
-                                    <span style={styles.factMiniLabel}>🔬 Scientific</span>
-                                    <span style={{ ...styles.factMiniValue, fontStyle: 'italic' }}>{factOfDay.scientificName || 'N/A'}</span>
-                                </div>
-                                <div style={styles.factMiniCard}>
-                                    <span style={styles.factMiniLabel}>⏳ Lifespan</span>
-                                    <span style={styles.factMiniValue}>{factOfDay.lifespan || 'N/A'}</span>
-                                </div>
-                                <div style={styles.factMiniCard}>
-                                    <span style={styles.factMiniLabel}>🥗 Diet</span>
-                                    <span style={styles.factMiniValue}>{factOfDay.diet || 'N/A'}</span>
-                                </div>
-                            </div>
-                            <div style={styles.factDescWrap}>
-                                <div>
-                                    <p style={styles.factText}>{factOfDay.fact}</p>
-                                    {factOfDay.slogan && (
-                                        <p style={styles.factSloganQuote}>💡 {factOfDay.slogan}</p>
-                                    )}
-                                </div>
-                                <p style={{ ...styles.factSource, marginTop: '8px' }}>Source: {factOfDay.source}</p>
+                        {/* Welcome Section */}
+                        <div style={styles.welcomeSection}>
+                            <h1 style={welcomeTitleStyle}>
+                                Welcome back, {user?.firstName || user?.name}! 👋
+                            </h1>
+                            <p style={welcomeSubtitleStyle}>
+                                Here's what's happening with your pets today
+                            </p>
+                            <div style={styles.welcomeMetaRow}>
+                                <span style={styles.welcomeMetaChip}>Pets: {pets.length}</span>
+                                <span style={styles.welcomeMetaChip}>Due Soon: {dueSoonReminders.length}</span>
+                                <span style={styles.welcomeMetaChip}>Streak: {activityStreak}d</span>
                             </div>
                         </div>
-                    ) : (
-                        <p style={styles.factText}>Loading your daily pet fact...</p>
-                    )}
-                </div>
 
-                <div style={styles.checklistCard}>
-                    <div style={styles.checklistHeader}>
-                        <h3 style={styles.checklistTitle}>Today's Checklist</h3>
-                        <div style={styles.checklistProgressLabel}>{completedChecklistCount}/{todayChecklist.length} done</div>
-                    </div>
-                    <div style={styles.checklistProgressBar}>
-                        <div style={{ ...styles.checklistProgressFill, width: `${checklistCompletion}%` }}></div>
-                    </div>
-                    
-                    <form onSubmit={handleAddChecklistItem} style={styles.checklistForm}>
-                        <input
-                            value={newChecklistItemText}
-                            onChange={(e) => setNewChecklistItemText(e.target.value)}
-                            placeholder="Add a new checklist task..."
-                            style={styles.checklistInput}
-                            aria-label="New checklist item"
-                        />
-                        <button type="submit" style={styles.checklistAddButton}>Add</button>
-                    </form>
-
-                    <div style={styles.checklistItems}>
-                        {todayChecklist.length === 0 ? (
-                            <p style={styles.checklistEmptyText}>No checklist tasks for today. Add one above! ✨</p>
-                        ) : (
-                            todayChecklist.map((item) => (
-                                <div
-                                    key={item.id}
-                                    style={item.done ? { ...styles.checklistItem, ...styles.checklistItemDone } : styles.checklistItem}
-                                >
-                                    <button
-                                        onClick={() => toggleChecklistItem(item.id)}
-                                        style={styles.checklistToggleBtn}
-                                        aria-label={item.done ? "Mark incomplete" : "Mark complete"}
-                                    >
-                                        <span style={styles.checklistBullet}>{item.done ? '✅' : '⬜'}</span>
-                                        <span style={{
-                                            ...styles.checklistText,
-                                            textDecoration: item.done ? 'line-through' : 'none',
-                                            opacity: item.done ? 0.7 : 1
-                                        }}>
-                                            {item.label}
-                                        </span>
-                                    </button>
-                                    <button
-                                        onClick={() => deleteChecklistItem(item.id)}
-                                        style={styles.checklistDeleteBtn}
-                                        aria-label="Delete item"
-                                    >
-                                        🗑️
-                                    </button>
+                        <div style={styles.hookStrip}>
+                            <div style={styles.hookCard}>
+                                <div style={styles.hookLabel}>Activity Streak</div>
+                                <div style={styles.hookValue}>{activityStreak} day{activityStreak !== 1 ? 's' : ''}</div>
+                                <div style={styles.hookHint}>Keep logging updates daily.</div>
+                            </div>
+                            <div style={styles.hookCard}>
+                                <div style={styles.hookLabel}>Care Score</div>
+                                <div style={styles.hookValue}>{careScore}%</div>
+                                <div style={styles.scoreBar}>
+                                    <div style={{ ...styles.scoreFill, width: `${careScore}%` }}></div>
                                 </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div style={styles.quickActions}>
-                    <h3 style={styles.sectionTitle}>Quick Actions</h3>
-                    <div style={styles.actionGrid}>
-                        <button onClick={() => navigate('/pets')} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>🐾</div>
-                            <div style={styles.actionTitle}>My Pets</div>
-                            <div style={styles.actionSubtitle}>{pets.length} pet{pets.length !== 1 ? 's' : ''}</div>
-                        </button>
-                        <button onClick={() => {
-                            const localPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
-                            if (localPets.length > 0) {
-                                navigate(`/pets/${localPets[0].id}/health`);
-                            } else {
-                                navigate('/pets');
-                            }
-                        }} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>📊</div>
-                            <div style={styles.actionTitle}>Health Trends</div>
-                            <div style={styles.actionSubtitle}>View progress over time</div>
-                        </button>
-                        <button onClick={() => navigate('/breeds')} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>🔍</div>
-                            <div style={styles.actionTitle}>Explore Breeds</div>
-                            <div style={styles.actionSubtitle}>Dog & Cat breeds</div>
-                        </button>
-                        <button onClick={() => navigate('/reminders')} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>⏰</div>
-                            <div style={styles.actionTitle}>Reminders</div>
-                            <div style={styles.actionSubtitle}>Upcoming care tasks</div>
-                        </button>
-                        <button onClick={() => navigate('/appointments')} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>🗓️</div>
-                            <div style={styles.actionTitle}>Appointments</div>
-                            <div style={styles.actionSubtitle}>Track vet visits</div>
-                        </button>
-                        <button onClick={() => navigate('/facts')} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>📚</div>
-                            <div style={styles.actionTitle}>Pet Facts</div>
-                            <div style={styles.actionSubtitle}>Learn something new</div>
-                        </button>
-                        <button onClick={() => navigate('/profile')} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>👤</div>
-                            <div style={styles.actionTitle}>My Profile</div>
-                            <div style={styles.actionSubtitle}>Account settings</div>
-                        </button>
-                        {/* FRS Feature 2: Role-Based UI Restriction */}
-                        {user?.role === 'ADMIN' && (
-                            <button onClick={() => navigate('/admin')} style={{...styles.actionCard, ...styles.adminCard}}>
-                                <div style={styles.actionIcon}>👨‍💼</div>
-                                <div style={styles.actionTitle}>Admin Panel</div>
-                                <div style={styles.actionSubtitle}>Manage users</div>
-                            </button>
-                        )}
-                        <button onClick={() => navigate('/pets/add')} style={styles.actionCard}>
-                            <div style={styles.actionIcon}>➕</div>
-                            <div style={styles.actionTitle}>Add Pet</div>
-                            <div style={styles.actionSubtitle}>New companion</div>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Your Pets Section */}
-                <div style={styles.petsSection}>
-                    <h3 style={styles.sectionTitle}>Your Pets</h3>
-                    {pets.length === 0 ? (
-                        <div style={styles.emptyState}>
-                            <p style={styles.emptyStateText}>🐾 No pets yet. Add your first companion!</p>
-                            <button onClick={() => navigate('/pets/add')} style={styles.addPetCTA}>
-                                Add Your First Pet
-                            </button>
+                            </div>
+                            <div style={styles.hookCard}>
+                                <div style={styles.hookLabel}>Due in 7 Days</div>
+                                <div style={styles.hookValue}>{dueSoonReminders.length}</div>
+                                <button onClick={() => navigate('/reminders')} style={styles.hookActionButton}>
+                                    View reminders
+                                </button>
+                            </div>
                         </div>
-                    ) : (
-                        <div style={styles.petsGridLayout}>
-                            {pets.map((pet) => (
-                                <div key={pet.id} style={styles.petCardWrapper}>
-                                    <div style={styles.petCardInner}>
-                                        <div style={styles.petImageContainer}>
-                                            {pet.imageUrl ? (
-                                                <img src={pet.imageUrl} alt={pet.name} style={styles.petImage} />
-                                            ) : (
-                                                <div style={styles.petPlaceholder}>
-                                                    {pet.species === 'Dog' ? '🐕' : 
-                                                     pet.species === 'Cat' ? '🐱' : 
-                                                     pet.species === 'Bird' ? '🦜' : 
-                                                     pet.species === 'Rabbit' ? '🐰' : 
-                                                     pet.species === 'Fish' ? '🐟' : '🐾'}
-                                                </div>
+
+                        <div style={styles.factCard}>
+                            <div style={styles.factHeader}>
+                                <h3 style={styles.factTitle}>Fact of the Day</h3>
+                                <button onClick={() => navigate('/facts')} style={styles.factMoreButton}>More facts</button>
+                            </div>
+                            {factOfDay ? (
+                                <div style={styles.factContentLayout}>
+                                    <div style={styles.factGrid}>
+                                        <div style={styles.factMiniCard}>
+                                            <span style={styles.factMiniLabel}>🧬 Species</span>
+                                            <span style={styles.factMiniValue}>{factOfDay.name || 'Pet'}</span>
+                                        </div>
+                                        <div style={styles.factMiniCard}>
+                                            <span style={styles.factMiniLabel}>🔬 Scientific</span>
+                                            <span style={{ ...styles.factMiniValue, fontStyle: 'italic' }}>{factOfDay.scientificName || 'N/A'}</span>
+                                        </div>
+                                        <div style={styles.factMiniCard}>
+                                            <span style={styles.factMiniLabel}>⏳ Lifespan</span>
+                                            <span style={styles.factMiniValue}>{factOfDay.lifespan || 'N/A'}</span>
+                                        </div>
+                                        <div style={styles.factMiniCard}>
+                                            <span style={styles.factMiniLabel}>🥗 Diet</span>
+                                            <span style={styles.factMiniValue}>{factOfDay.diet || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                    <div style={styles.factDescWrap}>
+                                        <div>
+                                            <p style={styles.factText}>{factOfDay.fact}</p>
+                                            {factOfDay.slogan && (
+                                                <p style={styles.factSloganQuote}>💡 {factOfDay.slogan}</p>
                                             )}
                                         </div>
-                                        <div style={styles.petDetails}>
-                                            <h4 style={styles.petTitle}>{pet.name}</h4>
-                                            <p style={styles.petSubtitle}>{pet.species}{pet.breed ? ` • ${pet.breed}` : ''}</p>
-                                            <div style={styles.petButtonRow}>
-                                                <button 
-                                                    onClick={() => navigate(`/pets/edit/${pet.id}`)}
-                                                    style={styles.petSmallButton}
-                                                >
-                                                    ✏️ Edit
-                                                </button>
-                                                <button 
-                                                    onClick={() => navigate(`/pets/${pet.id}/health`)}
-                                                    style={{...styles.petSmallButton, ...styles.healthBtn}}
-                                                >
-                                                    📊 Health
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <p style={{ ...styles.factSource, marginTop: '8px' }}>Source: {factOfDay.source}</p>
                                     </div>
                                 </div>
-                            ))}
+                            ) : (
+                                <p style={styles.factText}>Loading your daily pet fact...</p>
+                            )}
                         </div>
-                    )}
-                </div>
 
-                {/* Main Content Grid - Pets and Activities */}
-                <div style={styles.mainGrid}>
-                    <div style={styles.rightColumn}>
-                        <h3 style={styles.sectionTitle}>Recent Activities</h3>
-                        {recentActivities.length === 0 ? (
-                            <div style={styles.emptyActivities}>
-                                <p style={styles.emptyText}>No recent activities</p>
+                        <div style={styles.checklistCard}>
+                            <div style={styles.checklistHeader}>
+                                <h3 style={styles.checklistTitle}>Today's Checklist</h3>
+                                <div style={styles.checklistProgressLabel}>{completedChecklistCount}/{todayChecklist.length} done</div>
                             </div>
-                        ) : (
-                            <div style={styles.activitiesList}>
-                                {recentActivities.map((activity) => (
-                                    <div key={activity.id} style={styles.activityItem}>
-                                        <div style={styles.activityIcon}>{activity.icon}</div>
-                                        <div style={styles.activityContent}>
-                                            <div style={styles.activityPetName}>{activity.petName}</div>
-                                            <div style={styles.activityDescription}>{activity.description}</div>
-                                            <div style={styles.activityDate}>{formatActivityTimestamp(activity.timestamp)}</div>
+                            <div style={styles.checklistProgressBar}>
+                                <div style={{ ...styles.checklistProgressFill, width: `${checklistCompletion}%` }}></div>
+                            </div>
+
+                            <form onSubmit={handleAddChecklistItem} style={styles.checklistForm}>
+                                <input
+                                    value={newChecklistItemText}
+                                    onChange={(e) => setNewChecklistItemText(e.target.value)}
+                                    placeholder="Add a new checklist task..."
+                                    style={styles.checklistInput}
+                                    aria-label="New checklist item"
+                                />
+                                <button type="submit" style={styles.checklistAddButton}>Add</button>
+                            </form>
+
+                            <div style={styles.checklistItems}>
+                                {todayChecklist.length === 0 ? (
+                                    <p style={styles.checklistEmptyText}>No checklist tasks for today. Add one above! ✨</p>
+                                ) : (
+                                    todayChecklist.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            style={item.done ? { ...styles.checklistItem, ...styles.checklistItemDone } : styles.checklistItem}
+                                        >
+                                            <button
+                                                onClick={() => toggleChecklistItem(item.id)}
+                                                style={styles.checklistToggleBtn}
+                                                aria-label={item.done ? "Mark incomplete" : "Mark complete"}
+                                            >
+                                                <span style={styles.checklistBullet}>{item.done ? '✅' : '⬜'}</span>
+                                                <span style={{
+                                                    ...styles.checklistText,
+                                                    textDecoration: item.done ? 'line-through' : 'none',
+                                                    opacity: item.done ? 0.7 : 1
+                                                }}>
+                                                    {item.label}
+                                                </span>
+                                            </button>
+                                            <button
+                                                onClick={() => deleteChecklistItem(item.id)}
+                                                style={styles.checklistDeleteBtn}
+                                                aria-label="Delete item"
+                                            >
+                                                🗑️
+                                            </button>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
-                        )}
-                    </div>
-                </div>
+                        </div>
+
+                        {/* Quick Actions */}
+                        <div style={styles.quickActions}>
+                            <h3 style={styles.sectionTitle}>Quick Actions</h3>
+                            <div style={styles.actionGrid}>
+                                <button onClick={() => navigate('/pets')} style={styles.actionCard}>
+                                    <div style={styles.actionIcon}>🐾</div>
+                                    <div style={styles.actionTitle}>My Pets</div>
+                                    <div style={styles.actionSubtitle}>{pets.length} pet{pets.length !== 1 ? 's' : ''}</div>
+                                </button>
+                                <button onClick={() => {
+                                    const localPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+                                    if (localPets.length > 0) {
+                                        navigate(`/pets/${localPets[0].id}/health`);
+                                    } else {
+                                        navigate('/pets');
+                                    }
+                                }} style={styles.actionCard}>
+                                    <div style={styles.actionIcon}>📊</div>
+                                    <div style={styles.actionTitle}>Health Trends</div>
+                                    <div style={styles.actionSubtitle}>View progress over time</div>
+                                </button>
+                                <button onClick={() => navigate('/breeds')} style={styles.actionCard}>
+                                    <div style={styles.actionIcon}>🔍</div>
+                                    <div style={styles.actionTitle}>Explore Breeds</div>
+                                    <div style={styles.actionSubtitle}>Dog & Cat breeds</div>
+                                </button>
+                                <button onClick={() => navigate('/reminders')} style={styles.actionCard}>
+                                    <div style={styles.actionIcon}>⏰</div>
+                                    <div style={styles.actionTitle}>Reminders</div>
+                                    <div style={styles.actionSubtitle}>Upcoming care tasks</div>
+                                </button>
+                                <button onClick={() => navigate('/appointments')} style={styles.actionCard}>
+                                    <div style={styles.actionIcon}>🗓️</div>
+                                    <div style={styles.actionTitle}>Appointments</div>
+                                    <div style={styles.actionSubtitle}>Track vet visits</div>
+                                </button>
+                                <button onClick={() => navigate('/facts')} style={styles.actionCard}>
+                                    <div style={styles.actionIcon}>📚</div>
+                                    <div style={styles.actionTitle}>Pet Facts</div>
+                                    <div style={styles.actionSubtitle}>Learn something new</div>
+                                </button>
+                                <button onClick={() => navigate('/profile')} style={styles.actionCard}>
+                                    <div style={styles.actionIcon}>👤</div>
+                                    <div style={styles.actionTitle}>My Profile</div>
+                                    <div style={styles.actionSubtitle}>Account settings</div>
+                                </button>
+                                {/* FRS Feature 2: Role-Based UI Restriction */}
+                                {user?.role === 'ADMIN' && (
+                                    <button onClick={() => navigate('/admin')} style={{ ...styles.actionCard, ...styles.adminCard }}>
+                                        <div style={styles.actionIcon}>👨‍💼</div>
+                                        <div style={styles.actionTitle}>Admin Panel</div>
+                                        <div style={styles.actionSubtitle}>Manage users</div>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Divider Line */}
+                        <hr style={styles.divider} />
+
+                        {/* Your Pets Section */}
+                        <div style={styles.petsSection}>
+                            <div style={styles.sectionHeaderRow}>
+                                <h3 style={styles.sectionTitleNoMargin}>Your Pets</h3>
+                                <button onClick={() => navigate('/pets/add')} style={styles.addPetHeaderButton}>
+                                    Add Pet
+                                </button>
+                            </div>
+                            {pets.length === 0 ? (
+                                <div style={styles.emptyState}>
+                                    <p style={styles.emptyStateText}>🐾 No pets yet. Add your first companion!</p>
+                                    <button onClick={() => navigate('/pets/add')} style={styles.addPetCTA}>
+                                        Add Your First Pet
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={styles.petsGridLayout}>
+                                    {pets.map((pet) => (
+                                        <div key={pet.id} style={styles.petCardWrapper}>
+                                            <div style={styles.petCardInner}>
+                                                <div style={styles.petImageContainer}>
+                                                    {pet.imageUrl ? (
+                                                        <img src={pet.imageUrl} alt={pet.name} style={styles.petImage} />
+                                                    ) : (
+                                                        <div style={styles.petPlaceholder}>
+                                                            {pet.species === 'Dog' ? '🐕' :
+                                                                pet.species === 'Cat' ? '🐱' :
+                                                                    pet.species === 'Bird' ? '🦜' :
+                                                                        pet.species === 'Rabbit' ? '🐰' :
+                                                                            pet.species === 'Fish' ? '🐟' : '🐾'}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div style={styles.petDetails}>
+                                                    <h4 style={styles.petTitle}>{pet.name}</h4>
+                                                    <p style={styles.petSubtitle}>{pet.species}{pet.breed ? ` • ${pet.breed}` : ''}</p>
+                                                    <div style={styles.petButtonRow}>
+                                                        <button
+                                                            onClick={() => navigate(`/pets/edit/${pet.id}`)}
+                                                            style={styles.petSmallButton}
+                                                        >
+                                                            ✏️ Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => navigate(`/pets/${pet.id}/health`)}
+                                                            style={{ ...styles.petSmallButton, ...styles.healthBtn }}
+                                                        >
+                                                            📊 Health
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Main Content Grid - Pets and Activities */}
+                        <div style={styles.mainGrid}>
+                            <div style={styles.rightColumn}>
+                                <h3 style={styles.sectionTitle}>Recent Activities</h3>
+                                {recentActivities.length === 0 ? (
+                                    <div style={styles.emptyActivities}>
+                                        <p style={styles.emptyText}>No recent activities</p>
+                                    </div>
+                                ) : (
+                                    <div style={styles.activitiesList}>
+                                        {recentActivities.map((activity) => (
+                                            <div key={activity.id} style={styles.activityItem}>
+                                                <div style={styles.activityIcon}>{activity.icon}</div>
+                                                <div style={styles.activityContent}>
+                                                    <div style={styles.activityPetName}>{activity.petName}</div>
+                                                    <div style={styles.activityDescription}>{activity.description}</div>
+                                                    <div style={styles.activityDate}>{formatActivityTimestamp(activity.timestamp)}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
                     </div>
 
@@ -1962,6 +1981,37 @@ const styles = {
         padding: '60px 40px',
         textAlign: 'center',
         boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+    },
+    sectionHeaderRow: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '20px'
+    },
+    sectionTitleNoMargin: {
+        fontSize: '22px',
+        fontWeight: '700',
+        color: 'var(--text-primary)',
+        margin: 0,
+        textShadow: '0 2px 8px rgba(0,0,0,0.15)'
+    },
+    addPetHeaderButton: {
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        border: 'none',
+        padding: '8px 18px',
+        borderRadius: '20px',
+        fontSize: '14px',
+        fontWeight: '700',
+        cursor: 'pointer',
+        boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)',
+        transition: 'all 0.3s ease'
+    },
+    divider: {
+        border: 'none',
+        borderTop: '1px solid var(--card-border)',
+        margin: '10px 0',
+        opacity: 0.8
     }
 };
 
