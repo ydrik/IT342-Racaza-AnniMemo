@@ -809,7 +809,7 @@ const Dashboard = () => {
                             <div style={styles.actionTitle}>Health Trends</div>
                             <div style={styles.actionSubtitle}>View progress over time</div>
                         </button>
-                        <button onClick={() => navigate('/facts')} style={styles.actionCard}>
+                        <button onClick={() => navigate('/breeds')} style={styles.actionCard}>
                             <div style={styles.actionIcon}>🔍</div>
                             <div style={styles.actionTitle}>Explore Breeds</div>
                             <div style={styles.actionSubtitle}>Dog & Cat breeds</div>

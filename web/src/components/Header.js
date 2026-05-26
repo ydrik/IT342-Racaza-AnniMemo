@@ -72,7 +72,8 @@ const Header = () => {
         { title: '🐾 My Pets', path: '/pets', type: 'page', subtitle: 'Manage your pet profiles' },
         { title: '⏰ Reminders', path: '/reminders', type: 'page', subtitle: 'Care tasks and notifications' },
         { title: '🗓️ Appointments', path: '/appointments', type: 'page', subtitle: 'Schedule and track vet visits' },
-        { title: '📚 Pet Facts', path: '/facts', type: 'page', subtitle: 'Dog & Cat breeds list and facts' },
+        { title: '🔍 Explore Breeds', path: '/breeds', type: 'page', subtitle: 'Dog & Cat breeds information search' },
+        { title: '📚 Pet Facts', path: '/facts', type: 'page', subtitle: 'Dog, Cat and other pet facts library' },
         { title: '⚙️ Settings', path: '/settings', type: 'page', subtitle: 'Preferences and dashboard settings' },
         { title: '👤 My Profile', path: '/profile', type: 'page', subtitle: 'View and edit account profile' }
     ], []);
@@ -156,6 +157,8 @@ const Header = () => {
                 navigate('/appointments');
             } else if (query.includes('fact')) {
                 navigate('/facts');
+            } else if (query.includes('breed')) {
+                navigate('/breeds');
             } else if (query.includes('setting')) {
                 navigate('/settings');
             } else if (query.includes('profile')) {

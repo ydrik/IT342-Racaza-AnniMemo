@@ -21,6 +21,7 @@ import SettingsPage from './components/SettingsPage';
 import Footer from './components/Footer';
 import ThemeToggle from './components/ThemeToggle';
 import AppointmentTrackerPage from './components/AppointmentTrackerPage';
+import ExploreBreeds from './components/ExploreBreeds';
 
 function App() {
   const [theme, setTheme] = useState(() => {
@@ -58,7 +59,7 @@ function App() {
         
         {/* Redirect Fallbacks for Unmapped Features */}
         <Route path="/health-trends" element={<Navigate to="/pets" replace />} />
-        <Route path="/breeds" element={<Navigate to="/facts" replace />} />
+        <Route path="/breeds" element={<ExploreBreeds />} />
         
         {/* Footer Link Routes */}
         <Route path="/reminders" element={<RemindersPage />} />
