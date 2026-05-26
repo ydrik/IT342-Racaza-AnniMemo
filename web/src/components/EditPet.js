@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ActivityService from '../services/activity.service';
+import Header from './Header';
 
 const EditPet = () => {
     const navigate = useNavigate();
@@ -201,6 +202,7 @@ const EditPet = () => {
 
     return (
         <div style={styles.pageContainer}>
+            <Header />
             <div style={styles.container}>
                 <div style={styles.headerSection}>
                     <button onClick={() => navigate('/pets')} style={styles.backButton}>
@@ -465,12 +467,12 @@ const styles = {
     pageContainer: {
         minHeight: '100vh',
         background: 'var(--app-bg)',
-        padding: '40px 20px',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     },
     container: {
         maxWidth: '900px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '40px 20px'
     },
     loadingContainer: {
         display: 'flex',
@@ -493,11 +495,12 @@ const styles = {
         color: 'var(--text-primary)',
         fontSize: '14px',
         cursor: 'pointer',
-        marginBottom: '20px',
+        marginBottom: '16px',
         padding: '10px 20px',
-        fontWeight: '500',
+        fontWeight: '600',
         borderRadius: '20px',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'inline-block'
     },
     title: {
         fontSize: '42px',
@@ -605,7 +608,7 @@ const styles = {
         borderRadius: '10px',
         outline: 'none',
         fontFamily: 'inherit',
-        resize: 'vertical',
+        resize: 'none',
         transition: 'all 0.3s ease',
         backgroundColor: 'var(--surface)',
         color: 'var(--text-primary)',

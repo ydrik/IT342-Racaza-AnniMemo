@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ActivityService from '../services/activity.service';
+import Header from './Header';
 
 const AddPet = () => {
     const navigate = useNavigate();
@@ -145,6 +146,7 @@ const AddPet = () => {
 
     return (
         <div style={styles.pageContainer}>
+            <Header />
             <div style={styles.container}>
                 <div style={styles.headerSection}>
                     <button onClick={() => navigate('/pets')} style={styles.backButton}>
@@ -409,29 +411,29 @@ const styles = {
     pageContainer: {
         minHeight: '100vh',
         background: 'var(--app-bg)',
-        padding: '40px 20px',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     },
     container: {
         maxWidth: '900px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '40px 20px'
     },
     headerSection: {
         marginBottom: '40px',
         textAlign: 'center'
     },
     backButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'transparent',
         border: 'none',
-        color: 'white',
+        color: 'var(--text-primary)',
         fontSize: '14px',
         cursor: 'pointer',
-        marginBottom: '20px',
+        marginBottom: '16px',
         padding: '10px 20px',
-        fontWeight: '500',
+        fontWeight: '600',
         borderRadius: '20px',
-        backdropFilter: 'blur(10px)',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'inline-block'
     },
     title: {
         fontSize: '42px',
@@ -537,7 +539,7 @@ const styles = {
         borderRadius: '10px',
         outline: 'none',
         fontFamily: 'inherit',
-        resize: 'vertical',
+        resize: 'none',
         transition: 'all 0.3s ease',
         backgroundColor: '#fafafa',
         minHeight: '120px'
