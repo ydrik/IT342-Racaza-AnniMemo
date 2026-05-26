@@ -20,6 +20,7 @@ import PetFactsPage from './components/PetFactsPage';
 import SettingsPage from './components/SettingsPage';
 import Footer from './components/Footer';
 import ThemeToggle from './components/ThemeToggle';
+import AppointmentTrackerPage from './components/AppointmentTrackerPage';
 
 function App() {
   const [theme, setTheme] = useState(() => {
@@ -53,9 +54,9 @@ function App() {
         <Route path="/pets/add" element={<AddPet />} />
         <Route path="/pets/edit/:id" element={<EditPet />} />
         <Route path="/pets/:id/health" element={<HealthMetrics />} />
+        <Route path="/appointments" element={<AppointmentTrackerPage />} />
         
         {/* Redirect Fallbacks for Unmapped Features */}
-        <Route path="/appointments" element={<Navigate to="/reminders" replace />} />
         <Route path="/health-trends" element={<Navigate to="/pets" replace />} />
         <Route path="/breeds" element={<Navigate to="/facts" replace />} />
         

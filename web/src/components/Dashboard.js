@@ -717,7 +717,7 @@ const Dashboard = () => {
                         <button onClick={() => navigate('/dashboard')} style={styles.sidebarButton}>🏠 Dashboard</button>
                         <button onClick={() => navigate('/pets')} style={styles.sidebarButton}>🐾 My Pets</button>
                         <button onClick={() => navigate('/reminders')} style={styles.sidebarButton}>⏰ Reminders</button>
-                        <button onClick={() => navigate('/reminders')} style={styles.sidebarButton}>🗓️ Appointments</button>
+                        <button onClick={() => navigate('/appointments')} style={styles.sidebarButton}>🗓️ Appointments</button>
                         <button onClick={() => {
                             const localPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
                             if (localPets.length > 0) {
@@ -895,7 +895,7 @@ const Dashboard = () => {
                             <div style={styles.actionTitle}>Reminders</div>
                             <div style={styles.actionSubtitle}>Upcoming care tasks</div>
                         </button>
-                        <button onClick={() => navigate('/reminders')} style={styles.actionCard}>
+                        <button onClick={() => navigate('/appointments')} style={styles.actionCard}>
                             <div style={styles.actionIcon}>🗓️</div>
                             <div style={styles.actionTitle}>Appointments</div>
                             <div style={styles.actionSubtitle}>Track vet visits</div>
