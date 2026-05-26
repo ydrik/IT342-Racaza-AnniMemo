@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AnniMemo</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_pets">Pets</string>
+    <string name="title_reminders">Reminders</string>
+    <string name="title_profile">Profile</string>
+</resources>

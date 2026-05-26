@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ActivityService from '../services/activity.service';
+import Header from './Header';
 
 const AddPet = () => {
     const navigate = useNavigate();
@@ -73,6 +74,27 @@ const AddPet = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
+
+        // Date of Birth validation
+        const dob = petData.dateOfBirth;
+        if (dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            const minDate = new Date();
+            minDate.setFullYear(today.getFullYear() - 35); // Realistic max pet age is 35 years
+
+            if (birthDate > today) {
+                setMessage('Date of Birth cannot be in the future.');
+                setMessageType('error');
+                return;
+            }
+            if (birthDate < minDate) {
+                setMessage('Please enter a realistic Date of Birth (maximum 35 years ago).');
+                setMessageType('error');
+                return;
+            }
+        }
+
         setIsLoading(true);
 
         try {
@@ -97,7 +119,15 @@ const AddPet = () => {
                 }, 1500);
             }
         } catch (err) {
-            // For now, simulate success since backend isn't ready
+            // Persistent localStorage fallback
+            const newPet = {
+                ...petData,
+                id: Date.now() // Unique identifier
+            };
+            const existingPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+            existingPets.push(newPet);
+            localStorage.setItem('annimemo_pets', JSON.stringify(existingPets));
+
             setMessage('Pet profile created successfully! (Frontend only - backend pending)');
             setMessageType('success');
             ActivityService.logActivity({
@@ -116,6 +146,7 @@ const AddPet = () => {
 
     return (
         <div style={styles.pageContainer}>
+            <Header />
             <div style={styles.container}>
                 <div style={styles.headerSection}>
                     <button onClick={() => navigate('/pets')} style={styles.backButton}>
@@ -210,6 +241,9 @@ const AddPet = () => {
                                         name="dateOfBirth"
                                         value={petData.dateOfBirth}
                                         onChange={handleChange}
+                                        min="1990-01-01"
+                                        max={new Date().toISOString().split('T')[0]}
+                                        onKeyDown={(e) => e.preventDefault()}
                                         style={styles.input}
                                     />
                                 </div>
@@ -253,14 +287,33 @@ const AddPet = () => {
 
                                 <div style={styles.inputGroup}>
                                     <label style={styles.label}>Color</label>
-                                    <input
-                                        type="text"
+                                    <select
                                         name="color"
                                         value={petData.color}
                                         onChange={handleChange}
-                                        placeholder="e.g., Brown, White, Black"
-                                        style={styles.input}
-                                    />
+                                        style={styles.select}
+                                    >
+                                        <option value="">Select color</option>
+                                        <option value="Black">Black</option>
+                                        <option value="White">White</option>
+                                        <option value="Brown">Brown</option>
+                                        <option value="Golden">Golden</option>
+                                        <option value="Yellow">Yellow</option>
+                                        <option value="Cream">Cream</option>
+                                        <option value="Grey">Grey</option>
+                                        <option value="Orange">Orange</option>
+                                        <option value="Red">Red</option>
+                                        <option value="Blue">Blue</option>
+                                        <option value="Green">Green</option>
+                                        <option value="Silver">Silver</option>
+                                        <option value="Fawn">Fawn</option>
+                                        <option value="Brindle">Brindle</option>
+                                        <option value="Calico">Calico</option>
+                                        <option value="Tuxedo">Tuxedo</option>
+                                        <option value="Tortoiseshell">Tortoiseshell</option>
+                                        <option value="Multicolor">Multicolor</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -358,29 +411,29 @@ const styles = {
     pageContainer: {
         minHeight: '100vh',
         background: 'var(--app-bg)',
-        padding: '40px 20px',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     },
     container: {
         maxWidth: '900px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '40px 20px'
     },
     headerSection: {
         marginBottom: '40px',
         textAlign: 'center'
     },
     backButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'transparent',
         border: 'none',
-        color: 'white',
+        color: 'var(--text-primary)',
         fontSize: '14px',
         cursor: 'pointer',
-        marginBottom: '20px',
+        marginBottom: '16px',
         padding: '10px 20px',
-        fontWeight: '500',
+        fontWeight: '600',
         borderRadius: '20px',
-        backdropFilter: 'blur(10px)',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'inline-block'
     },
     title: {
         fontSize: '42px',
@@ -486,7 +539,7 @@ const styles = {
         borderRadius: '10px',
         outline: 'none',
         fontFamily: 'inherit',
-        resize: 'vertical',
+        resize: 'none',
         transition: 'all 0.3s ease',
         backgroundColor: '#fafafa',
         minHeight: '120px'

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from './Header';
 import ActivityService from '../services/activity.service';
 
 const PetList = () => {
@@ -34,30 +35,9 @@ const PetList = () => {
                 setPets(response.data);
             }
         } catch (err) {
-            // For now, use mock data since backend isn't ready
-            const mockPets = [
-                {
-                    id: 1,
-                    name: 'Max',
-                    species: 'Dog',
-                    breed: 'Golden Retriever',
-                    dateOfBirth: '2020-05-15',
-                    gender: 'Male',
-                    weight: 30.5,
-                    color: 'Golden'
-                },
-                {
-                    id: 2,
-                    name: 'Luna',
-                    species: 'Cat',
-                    breed: 'Persian',
-                    dateOfBirth: '2021-08-20',
-                    gender: 'Female',
-                    weight: 4.2,
-                    color: 'White'
-                }
-            ];
-            setPets(mockPets);
+            // Read from local storage since backend isn't ready
+            const localPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+            setPets(localPets);
         } finally {
             setIsLoading(false);
         }
@@ -85,9 +65,13 @@ const PetList = () => {
             });
             fetchPets();
         } catch (err) {
-            // For now, simulate success
-            setPets(pets.filter(pet => pet.id !== petId));
-            setMessage(`${petName}'s profile has been deleted! (Frontend only - backend pending)`);
+            // Delete from local storage fallback
+            const existingPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+            const filteredPets = existingPets.filter(pet => String(pet.id) !== String(petId));
+            localStorage.setItem('annimemo_pets', JSON.stringify(filteredPets));
+            
+            setPets(filteredPets);
+            setMessage(`${petName}'s profile has been deleted successfully! (Frontend only - backend pending)`);
             setMessageType('success');
             ActivityService.logActivity({
                 type: 'petDeleted',
@@ -122,6 +106,7 @@ const PetList = () => {
 
     return (
         <div style={styles.pageContainer}>
+            <Header />
             <div style={styles.container}>
                 <div style={styles.headerSection}>
                     <button onClick={() => navigate('/dashboard')} style={styles.backButton}>
@@ -246,12 +231,12 @@ const styles = {
     pageContainer: {
         minHeight: '100vh',
         background: 'var(--app-bg)',
-        padding: '40px 20px',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     },
     container: {
         maxWidth: '1200px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '40px 20px'
     },
     loadingContainer: {
         display: 'flex',

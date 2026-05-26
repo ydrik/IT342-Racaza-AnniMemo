@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_dashboard">
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.g3.annimemo.features.dashboard.ui.DashboardFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_pets"
+        android:name="com.g3.annimemo.features.pets.ui.PetsFragment"
+        android:label="@string/title_pets"
+        tools:layout="@layout/fragment_pets" />
+
+    <fragment
+        android:id="@+id/navigation_reminders"
+        android:name="com.g3.annimemo.features.reminders.ui.RemindersFragment"
+        android:label="@string/title_reminders"
+        tools:layout="@layout/fragment_reminders" />
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.g3.annimemo.features.profile.ui.ProfileFragment"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/navigation_appointments"
+        android:name="com.g3.annimemo.features.appointments.ui.AppointmentsFragment"
+        android:label="Appointments"
+        tools:layout="@layout/fragment_appointments" />
+
+    <fragment
+        android:id="@+id/navigation_explore_breeds"
+        android:name="com.g3.annimemo.features.breeds.ui.ExploreBreedsFragment"
+        android:label="Explore Breeds"
+        tools:layout="@layout/fragment_explore_breeds" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.g3.annimemo.features.settings.ui.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+</navigation>

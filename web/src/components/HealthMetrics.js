@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import ActivityService from '../services/activity.service';
+import Header from './Header';
 
 const HealthMetrics = () => {
     const navigate = useNavigate();
@@ -51,6 +52,7 @@ const HealthMetrics = () => {
         }
 
         fetchPetAndHealthData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, navigate]);
 
     const fetchPetAndHealthData = async () => {
@@ -69,8 +71,15 @@ const HealthMetrics = () => {
             });
             setHealthRecords(mapHealthRecords(healthResponse.data));
         } catch (err) {
-            // Mock data
-            setPetName('Max');
+            // Retrieve pet name from localStorage fallback if available
+            const existingPets = JSON.parse(localStorage.getItem('annimemo_pets') || '[]');
+            const foundPet = existingPets.find(p => String(p.id) === String(id));
+            if (foundPet) {
+                setPetName(foundPet.name);
+            } else {
+                setPetName('Max');
+            }
+            
             const mockHealthRecords = [
                 {
                     id: 1,
@@ -159,6 +168,8 @@ const HealthMetrics = () => {
                     treatment: formData.visitTreatment,
                     notes: formData.visitNotes
                 };
+                break;
+            default:
                 break;
         }
 
@@ -300,6 +311,7 @@ const HealthMetrics = () => {
 
     return (
         <div style={styles.pageContainer}>
+            <Header />
             <div style={styles.container}>
                 <div style={styles.headerSection}>
                     <button onClick={() => navigate('/pets')} style={styles.backButton}>
@@ -687,12 +699,12 @@ const styles = {
     pageContainer: {
         minHeight: '100vh',
         background: 'var(--app-bg)',
-        padding: '40px 20px',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
     },
     container: {
         maxWidth: '1100px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '40px 20px'
     },
     loadingContainer: {
         display: 'flex',
@@ -712,28 +724,28 @@ const styles = {
         animation: 'fadeInDown 0.6s ease-out'
     },
     backButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-        border: 'none',
-        color: 'white',
+        backgroundColor: 'var(--card-bg)',
+        border: '1.5px solid var(--card-border)',
+        color: 'var(--text-primary)',
         fontSize: '14px',
         cursor: 'pointer',
         marginBottom: '20px',
         padding: '10px 20px',
         fontWeight: '600',
         borderRadius: '20px',
-        backdropFilter: 'blur(10px)',
+        boxShadow: 'var(--shadow-soft)',
         transition: 'all 0.3s ease'
     },
     title: {
         fontSize: '38px',
         fontWeight: '700',
-        color: 'white',
+        color: 'var(--text-primary)',
         margin: '10px 0',
-        textShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        textShadow: '0 2px 10px rgba(0,0,0,0.1)'
     },
     subtitle: {
         fontSize: '18px',
-        color: 'rgba(255, 255, 255, 0.95)',
+        color: 'var(--text-secondary)',
         margin: '10px 0',
         fontWeight: '300'
     },
@@ -754,16 +766,16 @@ const styles = {
         animation: 'fadeInUp 0.6s ease-out'
     },
     tab: {
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        border: 'none',
+        backgroundColor: 'var(--card-bg)',
+        border: '1.5px solid var(--card-border)',
         padding: '14px 24px',
         borderRadius: '12px',
         cursor: 'pointer',
         fontSize: '15px',
         fontWeight: '600',
-        color: '#667eea',
+        color: 'var(--text-secondary)',
         transition: 'all 0.3s ease',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        boxShadow: 'var(--shadow-soft)'
     },
     activeTab: {
         background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
@@ -884,10 +896,11 @@ const styles = {
         transition: 'all 0.3s ease'
     },
     recordsContainer: {
-        backgroundColor: 'white',
+        backgroundColor: 'var(--card-bg)',
+        border: '1.5px solid var(--card-border)',
         borderRadius: '24px',
         padding: '32px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        boxShadow: 'var(--shadow-soft)',
         animation: 'slideUp 0.6s ease-out'
     },
     recordsTitle: {
@@ -915,14 +928,14 @@ const styles = {
     recordCard: {
         padding: '20px',
         borderRadius: '16px',
-        background: 'linear-gradient(135deg, #f8f9ff 0%, #fef9f3 100%)',
-        border: '2px solid #e9ecef',
+        backgroundColor: 'var(--surface)',
+        border: '1.5px solid var(--card-border)',
         transition: 'all 0.3s ease',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+        boxShadow: 'var(--shadow-soft)'
     },
     recordDate: {
         fontSize: '13px',
-        color: '#7f8c8d',
+        color: 'var(--text-muted)',
         marginBottom: '8px',
         fontWeight: '700',
         textTransform: 'uppercase',
@@ -939,19 +952,19 @@ const styles = {
     },
     recordDetail: {
         fontSize: '15px',
-        color: '#555',
+        color: 'var(--text-secondary)',
         marginBottom: '5px',
         fontWeight: '500'
     },
     recordNotes: {
         fontSize: '14px',
-        color: '#7f8c8d',
+        color: 'var(--text-muted)',
         fontStyle: 'italic',
         marginTop: '10px',
         padding: '12px',
-        backgroundColor: 'rgba(102, 126, 234, 0.05)',
+        backgroundColor: 'rgba(102, 126, 234, 0.08)',
         borderRadius: '8px',
-        borderLeft: '3px solid #667eea'
+        borderLeft: '3px solid var(--accent)'
     }
 };
 
