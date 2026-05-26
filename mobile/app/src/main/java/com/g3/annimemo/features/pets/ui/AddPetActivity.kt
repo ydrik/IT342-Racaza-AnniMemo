@@ -3,6 +3,7 @@ package com.g3.annimemo.features.pets.ui
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +33,22 @@ class AddPetActivity : AppCompatActivity() {
     
     private val calendar = Calendar.getInstance()
 
+    private val colorList = listOf(
+        "Select Color", "Black", "White", "Brown", "Golden", "Yellow", "Cream", "Grey",
+        "Orange", "Red", "Blue", "Green", "Silver", "Fawn", "Brindle", "Calico",
+        "Tuxedo", "Tortoiseshell", "Multicolor", "Other"
+    )
+
+    private val breedOptions = mapOf(
+        "Dog" to listOf("Select breed", "Golden Retriever", "Labrador Retriever", "German Shepherd", "Bulldog", "Beagle", "Poodle", "Rottweiler", "Yorkshire Terrier", "Boxer", "Dachshund", "Siberian Husky", "Shih Tzu", "Chihuahua", "Other"),
+        "Cat" to listOf("Select breed", "Persian", "Maine Coon", "Siamese", "Ragdoll", "Bengal", "British Shorthair", "Sphynx", "Scottish Fold", "Abyssinian", "American Shorthair", "Other"),
+        "Bird" to listOf("Select breed", "Parrot", "Cockatiel", "Parakeet", "Canary", "Finch", "Lovebird", "Macaw", "Budgie", "Other"),
+        "Rabbit" to listOf("Select breed", "Holland Lop", "Netherland Dwarf", "Flemish Giant", "Mini Rex", "Lionhead", "Dutch", "Other"),
+        "Hamster" to listOf("Select breed", "Syrian", "Dwarf Campbell Russian", "Dwarf Winter White Russian", "Roborovski", "Chinese", "Other"),
+        "Fish" to listOf("Select breed", "Goldfish", "Betta", "Guppy", "Angel Fish", "Tetra", "Molly", "Koi", "Other"),
+        "Other" to listOf("Select breed", "Mixed Breed", "Unknown", "Other")
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddPetBinding.inflate(layoutInflater)
@@ -55,7 +72,7 @@ class AddPetActivity : AppCompatActivity() {
 
     private fun setupSpinners() {
         // Species spinner
-        val speciesList = listOf("Dog", "Cat", "Bird", "Rabbit", "Fish", "Other")
+        val speciesList = listOf("Dog", "Cat", "Bird", "Rabbit", "Hamster", "Fish", "Other")
         val speciesAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, speciesList)
         speciesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerSpecies.adapter = speciesAdapter
@@ -65,6 +82,35 @@ class AddPetActivity : AppCompatActivity() {
         val genderAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, genderList)
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerGender.adapter = genderAdapter
+
+        // Color spinner
+        val colorAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, colorList)
+        colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerColor.adapter = colorAdapter
+
+        // Breed spinner dynamics
+        binding.spinnerSpecies.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedSpecies = speciesList[position]
+                updateBreedSpinner(selectedSpecies)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun updateBreedSpinner(species: String) {
+        val breeds = breedOptions[species] ?: breedOptions["Other"]!!
+        val breedAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, breeds)
+        breedAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerBreed.adapter = breedAdapter
+        
+        // If prepopulating mode, select matching breed if edit mode
+        petDto?.breed?.let { b ->
+            val idx = breeds.indexOf(b)
+            if (idx >= 0) {
+                binding.spinnerBreed.setSelection(idx)
+            }
+        }
     }
 
     private fun setupUI() {
@@ -118,14 +164,12 @@ class AddPetActivity : AppCompatActivity() {
 
     private fun prepopulateForm(pet: PetDto) {
         binding.etPetName.setText(pet.name)
-        binding.etPetBreed.setText(pet.breed ?: "")
         binding.etPetWeight.setText(pet.weight?.toString() ?: "")
-        binding.etPetColor.setText(pet.color ?: "")
         binding.etPetNotes.setText(pet.notes ?: "")
         binding.etPetDob.setText(pet.dateOfBirth ?: "")
         
         // Pre-select species
-        val speciesList = listOf("Dog", "Cat", "Bird", "Rabbit", "Fish", "Other")
+        val speciesList = listOf("Dog", "Cat", "Bird", "Rabbit", "Hamster", "Fish", "Other")
         val speciesIndex = speciesList.indexOf(pet.species)
         if (speciesIndex >= 0) {
             binding.spinnerSpecies.setSelection(speciesIndex)
@@ -136,6 +180,12 @@ class AddPetActivity : AppCompatActivity() {
         val genderIndex = genderList.indexOf(pet.gender)
         if (genderIndex >= 0) {
             binding.spinnerGender.setSelection(genderIndex)
+        }
+
+        // Pre-select color
+        val colorIndex = colorList.indexOf(pet.color ?: "")
+        if (colorIndex >= 0) {
+            binding.spinnerColor.setSelection(colorIndex)
         }
 
         if (!pet.dateOfBirth.isNullOrEmpty()) {
@@ -153,12 +203,12 @@ class AddPetActivity : AppCompatActivity() {
         
         val name = binding.etPetName.text.toString().trim()
         val species = binding.spinnerSpecies.selectedItem.toString()
-        val breed = binding.etPetBreed.text.toString().trim().ifEmpty { null }
+        val breed = binding.spinnerBreed.selectedItem?.toString()?.takeIf { it != "Select breed" }
         val gender = binding.spinnerGender.selectedItem.toString()
         val dob = binding.etPetDob.text.toString().trim().ifEmpty { null }
         val weightStr = binding.etPetWeight.text.toString().trim()
         val weight = weightStr.toDoubleOrNull()
-        val color = binding.etPetColor.text.toString().trim().ifEmpty { null }
+        val color = binding.spinnerColor.selectedItem?.toString()?.takeIf { it != "Select Color" }
         val notes = binding.etPetNotes.text.toString().trim().ifEmpty { null }
 
         // Validation

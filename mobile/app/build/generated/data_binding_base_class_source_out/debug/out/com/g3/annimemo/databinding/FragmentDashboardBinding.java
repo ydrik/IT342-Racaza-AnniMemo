@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -28,13 +29,46 @@ public final class FragmentDashboardBinding implements ViewBinding {
   public final LinearLayout activitiesContainer;
 
   @NonNull
+  public final LinearLayout appointmentsContainer;
+
+  @NonNull
+  public final LinearLayout btnActionAppointments;
+
+  @NonNull
+  public final LinearLayout btnActionBreeds;
+
+  @NonNull
+  public final LinearLayout btnActionHealth;
+
+  @NonNull
+  public final LinearLayout btnActionPets;
+
+  @NonNull
+  public final LinearLayout btnActionProfile;
+
+  @NonNull
+  public final LinearLayout btnActionReminders;
+
+  @NonNull
+  public final Button btnActionSettings;
+
+  @NonNull
   public final Button btnAddTask;
+
+  @NonNull
+  public final TextView btnClearSearch;
 
   @NonNull
   public final TextView btnSettingsGear;
 
   @NonNull
   public final Button btnStreakCheckin;
+
+  @NonNull
+  public final LinearLayout calendarAgendaContainer;
+
+  @NonNull
+  public final CalendarView calendarView;
 
   @NonNull
   public final LinearLayout checklistContainer;
@@ -46,13 +80,34 @@ public final class FragmentDashboardBinding implements ViewBinding {
   public final CardView cvFactCard;
 
   @NonNull
+  public final CardView cvSearchSuggestions;
+
+  @NonNull
+  public final LinearLayout dueSoonContainer;
+
+  @NonNull
   public final EditText etNewTask;
+
+  @NonNull
+  public final EditText etSearch;
+
+  @NonNull
+  public final LinearLayout healthTrendsContainer;
 
   @NonNull
   public final ProgressBar pbCareScore;
 
   @NonNull
   public final ProgressBar pbChecklist;
+
+  @NonNull
+  public final LinearLayout suggestionsContainer;
+
+  @NonNull
+  public final TextView tvAdjustmentsSpecies;
+
+  @NonNull
+  public final TextView tvAdjustmentsWindow;
 
   @NonNull
   public final TextView tvCareScoreValue;
@@ -88,27 +143,55 @@ public final class FragmentDashboardBinding implements ViewBinding {
   public final TextView tvWelcomeTitle;
 
   private FragmentDashboardBinding(@NonNull NestedScrollView rootView,
-      @NonNull LinearLayout activitiesContainer, @NonNull Button btnAddTask,
-      @NonNull TextView btnSettingsGear, @NonNull Button btnStreakCheckin,
-      @NonNull LinearLayout checklistContainer, @NonNull CardView cvDueSoonCard,
-      @NonNull CardView cvFactCard, @NonNull EditText etNewTask, @NonNull ProgressBar pbCareScore,
-      @NonNull ProgressBar pbChecklist, @NonNull TextView tvCareScoreValue,
-      @NonNull TextView tvChecklistCount, @NonNull TextView tvDueSoonValue,
-      @NonNull TextView tvFactDiet, @NonNull TextView tvFactLifespan,
-      @NonNull TextView tvFactScientific, @NonNull TextView tvFactSpecies,
-      @NonNull TextView tvFactText, @NonNull TextView tvStreakValue,
-      @NonNull TextView tvWelcomeSubtitle, @NonNull TextView tvWelcomeTitle) {
+      @NonNull LinearLayout activitiesContainer, @NonNull LinearLayout appointmentsContainer,
+      @NonNull LinearLayout btnActionAppointments, @NonNull LinearLayout btnActionBreeds,
+      @NonNull LinearLayout btnActionHealth, @NonNull LinearLayout btnActionPets,
+      @NonNull LinearLayout btnActionProfile, @NonNull LinearLayout btnActionReminders,
+      @NonNull Button btnActionSettings, @NonNull Button btnAddTask,
+      @NonNull TextView btnClearSearch, @NonNull TextView btnSettingsGear,
+      @NonNull Button btnStreakCheckin, @NonNull LinearLayout calendarAgendaContainer,
+      @NonNull CalendarView calendarView, @NonNull LinearLayout checklistContainer,
+      @NonNull CardView cvDueSoonCard, @NonNull CardView cvFactCard,
+      @NonNull CardView cvSearchSuggestions, @NonNull LinearLayout dueSoonContainer,
+      @NonNull EditText etNewTask, @NonNull EditText etSearch,
+      @NonNull LinearLayout healthTrendsContainer, @NonNull ProgressBar pbCareScore,
+      @NonNull ProgressBar pbChecklist, @NonNull LinearLayout suggestionsContainer,
+      @NonNull TextView tvAdjustmentsSpecies, @NonNull TextView tvAdjustmentsWindow,
+      @NonNull TextView tvCareScoreValue, @NonNull TextView tvChecklistCount,
+      @NonNull TextView tvDueSoonValue, @NonNull TextView tvFactDiet,
+      @NonNull TextView tvFactLifespan, @NonNull TextView tvFactScientific,
+      @NonNull TextView tvFactSpecies, @NonNull TextView tvFactText,
+      @NonNull TextView tvStreakValue, @NonNull TextView tvWelcomeSubtitle,
+      @NonNull TextView tvWelcomeTitle) {
     this.rootView = rootView;
     this.activitiesContainer = activitiesContainer;
+    this.appointmentsContainer = appointmentsContainer;
+    this.btnActionAppointments = btnActionAppointments;
+    this.btnActionBreeds = btnActionBreeds;
+    this.btnActionHealth = btnActionHealth;
+    this.btnActionPets = btnActionPets;
+    this.btnActionProfile = btnActionProfile;
+    this.btnActionReminders = btnActionReminders;
+    this.btnActionSettings = btnActionSettings;
     this.btnAddTask = btnAddTask;
+    this.btnClearSearch = btnClearSearch;
     this.btnSettingsGear = btnSettingsGear;
     this.btnStreakCheckin = btnStreakCheckin;
+    this.calendarAgendaContainer = calendarAgendaContainer;
+    this.calendarView = calendarView;
     this.checklistContainer = checklistContainer;
     this.cvDueSoonCard = cvDueSoonCard;
     this.cvFactCard = cvFactCard;
+    this.cvSearchSuggestions = cvSearchSuggestions;
+    this.dueSoonContainer = dueSoonContainer;
     this.etNewTask = etNewTask;
+    this.etSearch = etSearch;
+    this.healthTrendsContainer = healthTrendsContainer;
     this.pbCareScore = pbCareScore;
     this.pbChecklist = pbChecklist;
+    this.suggestionsContainer = suggestionsContainer;
+    this.tvAdjustmentsSpecies = tvAdjustmentsSpecies;
+    this.tvAdjustmentsWindow = tvAdjustmentsWindow;
     this.tvCareScoreValue = tvCareScoreValue;
     this.tvChecklistCount = tvChecklistCount;
     this.tvDueSoonValue = tvDueSoonValue;
@@ -155,9 +238,63 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.appointments_container;
+      LinearLayout appointmentsContainer = ViewBindings.findChildViewById(rootView, id);
+      if (appointmentsContainer == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_action_appointments;
+      LinearLayout btnActionAppointments = ViewBindings.findChildViewById(rootView, id);
+      if (btnActionAppointments == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_action_breeds;
+      LinearLayout btnActionBreeds = ViewBindings.findChildViewById(rootView, id);
+      if (btnActionBreeds == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_action_health;
+      LinearLayout btnActionHealth = ViewBindings.findChildViewById(rootView, id);
+      if (btnActionHealth == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_action_pets;
+      LinearLayout btnActionPets = ViewBindings.findChildViewById(rootView, id);
+      if (btnActionPets == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_action_profile;
+      LinearLayout btnActionProfile = ViewBindings.findChildViewById(rootView, id);
+      if (btnActionProfile == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_action_reminders;
+      LinearLayout btnActionReminders = ViewBindings.findChildViewById(rootView, id);
+      if (btnActionReminders == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_action_settings;
+      Button btnActionSettings = ViewBindings.findChildViewById(rootView, id);
+      if (btnActionSettings == null) {
+        break missingId;
+      }
+
       id = R.id.btn_add_task;
       Button btnAddTask = ViewBindings.findChildViewById(rootView, id);
       if (btnAddTask == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_clear_search;
+      TextView btnClearSearch = ViewBindings.findChildViewById(rootView, id);
+      if (btnClearSearch == null) {
         break missingId;
       }
 
@@ -170,6 +307,18 @@ public final class FragmentDashboardBinding implements ViewBinding {
       id = R.id.btn_streak_checkin;
       Button btnStreakCheckin = ViewBindings.findChildViewById(rootView, id);
       if (btnStreakCheckin == null) {
+        break missingId;
+      }
+
+      id = R.id.calendar_agenda_container;
+      LinearLayout calendarAgendaContainer = ViewBindings.findChildViewById(rootView, id);
+      if (calendarAgendaContainer == null) {
+        break missingId;
+      }
+
+      id = R.id.calendar_view;
+      CalendarView calendarView = ViewBindings.findChildViewById(rootView, id);
+      if (calendarView == null) {
         break missingId;
       }
 
@@ -191,9 +340,33 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.cv_search_suggestions;
+      CardView cvSearchSuggestions = ViewBindings.findChildViewById(rootView, id);
+      if (cvSearchSuggestions == null) {
+        break missingId;
+      }
+
+      id = R.id.due_soon_container;
+      LinearLayout dueSoonContainer = ViewBindings.findChildViewById(rootView, id);
+      if (dueSoonContainer == null) {
+        break missingId;
+      }
+
       id = R.id.et_new_task;
       EditText etNewTask = ViewBindings.findChildViewById(rootView, id);
       if (etNewTask == null) {
+        break missingId;
+      }
+
+      id = R.id.et_search;
+      EditText etSearch = ViewBindings.findChildViewById(rootView, id);
+      if (etSearch == null) {
+        break missingId;
+      }
+
+      id = R.id.health_trends_container;
+      LinearLayout healthTrendsContainer = ViewBindings.findChildViewById(rootView, id);
+      if (healthTrendsContainer == null) {
         break missingId;
       }
 
@@ -206,6 +379,24 @@ public final class FragmentDashboardBinding implements ViewBinding {
       id = R.id.pb_checklist;
       ProgressBar pbChecklist = ViewBindings.findChildViewById(rootView, id);
       if (pbChecklist == null) {
+        break missingId;
+      }
+
+      id = R.id.suggestions_container;
+      LinearLayout suggestionsContainer = ViewBindings.findChildViewById(rootView, id);
+      if (suggestionsContainer == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_adjustments_species;
+      TextView tvAdjustmentsSpecies = ViewBindings.findChildViewById(rootView, id);
+      if (tvAdjustmentsSpecies == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_adjustments_window;
+      TextView tvAdjustmentsWindow = ViewBindings.findChildViewById(rootView, id);
+      if (tvAdjustmentsWindow == null) {
         break missingId;
       }
 
@@ -276,10 +467,14 @@ public final class FragmentDashboardBinding implements ViewBinding {
       }
 
       return new FragmentDashboardBinding((NestedScrollView) rootView, activitiesContainer,
-          btnAddTask, btnSettingsGear, btnStreakCheckin, checklistContainer, cvDueSoonCard,
-          cvFactCard, etNewTask, pbCareScore, pbChecklist, tvCareScoreValue, tvChecklistCount,
-          tvDueSoonValue, tvFactDiet, tvFactLifespan, tvFactScientific, tvFactSpecies, tvFactText,
-          tvStreakValue, tvWelcomeSubtitle, tvWelcomeTitle);
+          appointmentsContainer, btnActionAppointments, btnActionBreeds, btnActionHealth,
+          btnActionPets, btnActionProfile, btnActionReminders, btnActionSettings, btnAddTask,
+          btnClearSearch, btnSettingsGear, btnStreakCheckin, calendarAgendaContainer, calendarView,
+          checklistContainer, cvDueSoonCard, cvFactCard, cvSearchSuggestions, dueSoonContainer,
+          etNewTask, etSearch, healthTrendsContainer, pbCareScore, pbChecklist,
+          suggestionsContainer, tvAdjustmentsSpecies, tvAdjustmentsWindow, tvCareScoreValue,
+          tvChecklistCount, tvDueSoonValue, tvFactDiet, tvFactLifespan, tvFactScientific,
+          tvFactSpecies, tvFactText, tvStreakValue, tvWelcomeSubtitle, tvWelcomeTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

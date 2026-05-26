@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.navigation.fragment.findNavController
 import com.g3.annimemo.R
 import com.g3.annimemo.core.data.LocalStorageManager
 import com.g3.annimemo.core.data.TokenManager
@@ -75,6 +76,10 @@ class RemindersFragment : Fragment() {
     }
 
     private fun setupUI() {
+        binding.btnBackToDashboard.setOnClickListener {
+            findNavController().navigate(R.id.navigation_dashboard)
+        }
+
         // Expand/Collapse Create Reminder form card
         binding.layoutToggleForm.setOnClickListener {
             toggleFormVisibility()

@@ -4,10 +4,13 @@ package com.g3.annimemo.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.widget.NestedScrollView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.g3.annimemo.R;
@@ -17,20 +20,83 @@ import java.lang.String;
 
 public final class FragmentProfileBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
+  private final NestedScrollView rootView;
 
   @NonNull
-  public final TextView textProfile;
+  public final Button btnBackToDashboard;
 
-  private FragmentProfileBinding(@NonNull ConstraintLayout rootView,
-      @NonNull TextView textProfile) {
+  @NonNull
+  public final Button btnChangePassword;
+
+  @NonNull
+  public final Button btnRemovePhoto;
+
+  @NonNull
+  public final Button btnSaveProfile;
+
+  @NonNull
+  public final Button btnUploadPhoto;
+
+  @NonNull
+  public final EditText etProfileConfirmPassword;
+
+  @NonNull
+  public final EditText etProfileCurrentPassword;
+
+  @NonNull
+  public final EditText etProfileEmail;
+
+  @NonNull
+  public final EditText etProfileFirstName;
+
+  @NonNull
+  public final EditText etProfileLastName;
+
+  @NonNull
+  public final EditText etProfileNewPassword;
+
+  @NonNull
+  public final EditText etProfileUsername;
+
+  @NonNull
+  public final ImageView ivProfileAvatar;
+
+  @NonNull
+  public final TextView tvProfileInitials;
+
+  @NonNull
+  public final TextView tvProfileMessage;
+
+  private FragmentProfileBinding(@NonNull NestedScrollView rootView,
+      @NonNull Button btnBackToDashboard, @NonNull Button btnChangePassword,
+      @NonNull Button btnRemovePhoto, @NonNull Button btnSaveProfile,
+      @NonNull Button btnUploadPhoto, @NonNull EditText etProfileConfirmPassword,
+      @NonNull EditText etProfileCurrentPassword, @NonNull EditText etProfileEmail,
+      @NonNull EditText etProfileFirstName, @NonNull EditText etProfileLastName,
+      @NonNull EditText etProfileNewPassword, @NonNull EditText etProfileUsername,
+      @NonNull ImageView ivProfileAvatar, @NonNull TextView tvProfileInitials,
+      @NonNull TextView tvProfileMessage) {
     this.rootView = rootView;
-    this.textProfile = textProfile;
+    this.btnBackToDashboard = btnBackToDashboard;
+    this.btnChangePassword = btnChangePassword;
+    this.btnRemovePhoto = btnRemovePhoto;
+    this.btnSaveProfile = btnSaveProfile;
+    this.btnUploadPhoto = btnUploadPhoto;
+    this.etProfileConfirmPassword = etProfileConfirmPassword;
+    this.etProfileCurrentPassword = etProfileCurrentPassword;
+    this.etProfileEmail = etProfileEmail;
+    this.etProfileFirstName = etProfileFirstName;
+    this.etProfileLastName = etProfileLastName;
+    this.etProfileNewPassword = etProfileNewPassword;
+    this.etProfileUsername = etProfileUsername;
+    this.ivProfileAvatar = ivProfileAvatar;
+    this.tvProfileInitials = tvProfileInitials;
+    this.tvProfileMessage = tvProfileMessage;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public NestedScrollView getRoot() {
     return rootView;
   }
 
@@ -55,13 +121,101 @@ public final class FragmentProfileBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.text_profile;
-      TextView textProfile = ViewBindings.findChildViewById(rootView, id);
-      if (textProfile == null) {
+      id = R.id.btn_back_to_dashboard;
+      Button btnBackToDashboard = ViewBindings.findChildViewById(rootView, id);
+      if (btnBackToDashboard == null) {
         break missingId;
       }
 
-      return new FragmentProfileBinding((ConstraintLayout) rootView, textProfile);
+      id = R.id.btn_change_password;
+      Button btnChangePassword = ViewBindings.findChildViewById(rootView, id);
+      if (btnChangePassword == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_remove_photo;
+      Button btnRemovePhoto = ViewBindings.findChildViewById(rootView, id);
+      if (btnRemovePhoto == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_save_profile;
+      Button btnSaveProfile = ViewBindings.findChildViewById(rootView, id);
+      if (btnSaveProfile == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_upload_photo;
+      Button btnUploadPhoto = ViewBindings.findChildViewById(rootView, id);
+      if (btnUploadPhoto == null) {
+        break missingId;
+      }
+
+      id = R.id.et_profile_confirm_password;
+      EditText etProfileConfirmPassword = ViewBindings.findChildViewById(rootView, id);
+      if (etProfileConfirmPassword == null) {
+        break missingId;
+      }
+
+      id = R.id.et_profile_current_password;
+      EditText etProfileCurrentPassword = ViewBindings.findChildViewById(rootView, id);
+      if (etProfileCurrentPassword == null) {
+        break missingId;
+      }
+
+      id = R.id.et_profile_email;
+      EditText etProfileEmail = ViewBindings.findChildViewById(rootView, id);
+      if (etProfileEmail == null) {
+        break missingId;
+      }
+
+      id = R.id.et_profile_first_name;
+      EditText etProfileFirstName = ViewBindings.findChildViewById(rootView, id);
+      if (etProfileFirstName == null) {
+        break missingId;
+      }
+
+      id = R.id.et_profile_last_name;
+      EditText etProfileLastName = ViewBindings.findChildViewById(rootView, id);
+      if (etProfileLastName == null) {
+        break missingId;
+      }
+
+      id = R.id.et_profile_new_password;
+      EditText etProfileNewPassword = ViewBindings.findChildViewById(rootView, id);
+      if (etProfileNewPassword == null) {
+        break missingId;
+      }
+
+      id = R.id.et_profile_username;
+      EditText etProfileUsername = ViewBindings.findChildViewById(rootView, id);
+      if (etProfileUsername == null) {
+        break missingId;
+      }
+
+      id = R.id.iv_profile_avatar;
+      ImageView ivProfileAvatar = ViewBindings.findChildViewById(rootView, id);
+      if (ivProfileAvatar == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_profile_initials;
+      TextView tvProfileInitials = ViewBindings.findChildViewById(rootView, id);
+      if (tvProfileInitials == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_profile_message;
+      TextView tvProfileMessage = ViewBindings.findChildViewById(rootView, id);
+      if (tvProfileMessage == null) {
+        break missingId;
+      }
+
+      return new FragmentProfileBinding((NestedScrollView) rootView, btnBackToDashboard,
+          btnChangePassword, btnRemovePhoto, btnSaveProfile, btnUploadPhoto,
+          etProfileConfirmPassword, etProfileCurrentPassword, etProfileEmail, etProfileFirstName,
+          etProfileLastName, etProfileNewPassword, etProfileUsername, ivProfileAvatar,
+          tvProfileInitials, tvProfileMessage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
