@@ -23,11 +23,10 @@
         android:extractNativeLibs="false"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/Theme.AnniMemo"
         android:usesCleartextTraffic="true" >
         <activity
-            android:name="com.g3.annimemo.ui.auth.LoginActivity"
+            android:name="com.g3.annimemo.features.auth.ui.LoginActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,8 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.g3.annimemo.ui.auth.RegisterActivity" />
+        <activity android:name="com.g3.annimemo.features.auth.ui.RegisterActivity" />
         <activity android:name="com.g3.annimemo.MainActivity" />
+        <activity android:name="com.g3.annimemo.features.pets.ui.AddPetActivity" />
+        <activity android:name="com.g3.annimemo.features.pets.ui.HealthMetricsActivity" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"

@@ -67,3 +67,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
+
+// Workaround for "Task 'prepareKotlinBuildScriptModel' not found" error
+tasks.register("prepareKotlinBuildScriptModel") { }
+

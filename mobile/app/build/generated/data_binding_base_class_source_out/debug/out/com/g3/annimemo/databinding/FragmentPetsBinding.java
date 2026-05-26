@@ -4,32 +4,54 @@ package com.g3.annimemo.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.g3.annimemo.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
 
 public final class FragmentPetsBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
+  private final CoordinatorLayout rootView;
 
   @NonNull
-  public final TextView textPets;
+  public final Button btnPetsAddFirst;
 
-  private FragmentPetsBinding(@NonNull ConstraintLayout rootView, @NonNull TextView textPets) {
+  @NonNull
+  public final FloatingActionButton fabAddPet;
+
+  @NonNull
+  public final LinearLayout layoutPetsEmpty;
+
+  @NonNull
+  public final RecyclerView rvPets;
+
+  @NonNull
+  public final TextView tvPetsMessage;
+
+  private FragmentPetsBinding(@NonNull CoordinatorLayout rootView, @NonNull Button btnPetsAddFirst,
+      @NonNull FloatingActionButton fabAddPet, @NonNull LinearLayout layoutPetsEmpty,
+      @NonNull RecyclerView rvPets, @NonNull TextView tvPetsMessage) {
     this.rootView = rootView;
-    this.textPets = textPets;
+    this.btnPetsAddFirst = btnPetsAddFirst;
+    this.fabAddPet = fabAddPet;
+    this.layoutPetsEmpty = layoutPetsEmpty;
+    this.rvPets = rvPets;
+    this.tvPetsMessage = tvPetsMessage;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public CoordinatorLayout getRoot() {
     return rootView;
   }
 
@@ -54,13 +76,38 @@ public final class FragmentPetsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.text_pets;
-      TextView textPets = ViewBindings.findChildViewById(rootView, id);
-      if (textPets == null) {
+      id = R.id.btn_pets_add_first;
+      Button btnPetsAddFirst = ViewBindings.findChildViewById(rootView, id);
+      if (btnPetsAddFirst == null) {
         break missingId;
       }
 
-      return new FragmentPetsBinding((ConstraintLayout) rootView, textPets);
+      id = R.id.fab_add_pet;
+      FloatingActionButton fabAddPet = ViewBindings.findChildViewById(rootView, id);
+      if (fabAddPet == null) {
+        break missingId;
+      }
+
+      id = R.id.layout_pets_empty;
+      LinearLayout layoutPetsEmpty = ViewBindings.findChildViewById(rootView, id);
+      if (layoutPetsEmpty == null) {
+        break missingId;
+      }
+
+      id = R.id.rv_pets;
+      RecyclerView rvPets = ViewBindings.findChildViewById(rootView, id);
+      if (rvPets == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_pets_message;
+      TextView tvPetsMessage = ViewBindings.findChildViewById(rootView, id);
+      if (tvPetsMessage == null) {
+        break missingId;
+      }
+
+      return new FragmentPetsBinding((CoordinatorLayout) rootView, btnPetsAddFirst, fabAddPet,
+          layoutPetsEmpty, rvPets, tvPetsMessage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

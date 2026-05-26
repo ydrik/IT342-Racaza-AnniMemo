@@ -4,10 +4,17 @@ package com.g3.annimemo.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.g3.annimemo.R;
@@ -17,20 +24,83 @@ import java.lang.String;
 
 public final class FragmentRemindersBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
+  private final CoordinatorLayout rootView;
 
   @NonNull
-  public final TextView textReminders;
+  public final ImageButton btnPickReminderDate;
 
-  private FragmentRemindersBinding(@NonNull ConstraintLayout rootView,
-      @NonNull TextView textReminders) {
+  @NonNull
+  public final Button btnSaveReminder;
+
+  @NonNull
+  public final CardView cvAddReminder;
+
+  @NonNull
+  public final EditText etReminderDueDate;
+
+  @NonNull
+  public final EditText etReminderTitle;
+
+  @NonNull
+  public final LinearLayout layoutReminderFields;
+
+  @NonNull
+  public final LinearLayout layoutRemindersEmpty;
+
+  @NonNull
+  public final LinearLayout layoutToggleForm;
+
+  @NonNull
+  public final RecyclerView rvReminders;
+
+  @NonNull
+  public final Spinner spinnerReminderPet;
+
+  @NonNull
+  public final Spinner spinnerReminderType;
+
+  @NonNull
+  public final Spinner spinnerRemindersFilter;
+
+  @NonNull
+  public final TextView tvFormToggleIcon;
+
+  @NonNull
+  public final TextView tvFormToggleTitle;
+
+  @NonNull
+  public final TextView tvRemindersMessage;
+
+  private FragmentRemindersBinding(@NonNull CoordinatorLayout rootView,
+      @NonNull ImageButton btnPickReminderDate, @NonNull Button btnSaveReminder,
+      @NonNull CardView cvAddReminder, @NonNull EditText etReminderDueDate,
+      @NonNull EditText etReminderTitle, @NonNull LinearLayout layoutReminderFields,
+      @NonNull LinearLayout layoutRemindersEmpty, @NonNull LinearLayout layoutToggleForm,
+      @NonNull RecyclerView rvReminders, @NonNull Spinner spinnerReminderPet,
+      @NonNull Spinner spinnerReminderType, @NonNull Spinner spinnerRemindersFilter,
+      @NonNull TextView tvFormToggleIcon, @NonNull TextView tvFormToggleTitle,
+      @NonNull TextView tvRemindersMessage) {
     this.rootView = rootView;
-    this.textReminders = textReminders;
+    this.btnPickReminderDate = btnPickReminderDate;
+    this.btnSaveReminder = btnSaveReminder;
+    this.cvAddReminder = cvAddReminder;
+    this.etReminderDueDate = etReminderDueDate;
+    this.etReminderTitle = etReminderTitle;
+    this.layoutReminderFields = layoutReminderFields;
+    this.layoutRemindersEmpty = layoutRemindersEmpty;
+    this.layoutToggleForm = layoutToggleForm;
+    this.rvReminders = rvReminders;
+    this.spinnerReminderPet = spinnerReminderPet;
+    this.spinnerReminderType = spinnerReminderType;
+    this.spinnerRemindersFilter = spinnerRemindersFilter;
+    this.tvFormToggleIcon = tvFormToggleIcon;
+    this.tvFormToggleTitle = tvFormToggleTitle;
+    this.tvRemindersMessage = tvRemindersMessage;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public CoordinatorLayout getRoot() {
     return rootView;
   }
 
@@ -55,13 +125,101 @@ public final class FragmentRemindersBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.text_reminders;
-      TextView textReminders = ViewBindings.findChildViewById(rootView, id);
-      if (textReminders == null) {
+      id = R.id.btn_pick_reminder_date;
+      ImageButton btnPickReminderDate = ViewBindings.findChildViewById(rootView, id);
+      if (btnPickReminderDate == null) {
         break missingId;
       }
 
-      return new FragmentRemindersBinding((ConstraintLayout) rootView, textReminders);
+      id = R.id.btn_save_reminder;
+      Button btnSaveReminder = ViewBindings.findChildViewById(rootView, id);
+      if (btnSaveReminder == null) {
+        break missingId;
+      }
+
+      id = R.id.cv_add_reminder;
+      CardView cvAddReminder = ViewBindings.findChildViewById(rootView, id);
+      if (cvAddReminder == null) {
+        break missingId;
+      }
+
+      id = R.id.et_reminder_due_date;
+      EditText etReminderDueDate = ViewBindings.findChildViewById(rootView, id);
+      if (etReminderDueDate == null) {
+        break missingId;
+      }
+
+      id = R.id.et_reminder_title;
+      EditText etReminderTitle = ViewBindings.findChildViewById(rootView, id);
+      if (etReminderTitle == null) {
+        break missingId;
+      }
+
+      id = R.id.layout_reminder_fields;
+      LinearLayout layoutReminderFields = ViewBindings.findChildViewById(rootView, id);
+      if (layoutReminderFields == null) {
+        break missingId;
+      }
+
+      id = R.id.layout_reminders_empty;
+      LinearLayout layoutRemindersEmpty = ViewBindings.findChildViewById(rootView, id);
+      if (layoutRemindersEmpty == null) {
+        break missingId;
+      }
+
+      id = R.id.layout_toggle_form;
+      LinearLayout layoutToggleForm = ViewBindings.findChildViewById(rootView, id);
+      if (layoutToggleForm == null) {
+        break missingId;
+      }
+
+      id = R.id.rv_reminders;
+      RecyclerView rvReminders = ViewBindings.findChildViewById(rootView, id);
+      if (rvReminders == null) {
+        break missingId;
+      }
+
+      id = R.id.spinner_reminder_pet;
+      Spinner spinnerReminderPet = ViewBindings.findChildViewById(rootView, id);
+      if (spinnerReminderPet == null) {
+        break missingId;
+      }
+
+      id = R.id.spinner_reminder_type;
+      Spinner spinnerReminderType = ViewBindings.findChildViewById(rootView, id);
+      if (spinnerReminderType == null) {
+        break missingId;
+      }
+
+      id = R.id.spinner_reminders_filter;
+      Spinner spinnerRemindersFilter = ViewBindings.findChildViewById(rootView, id);
+      if (spinnerRemindersFilter == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_form_toggle_icon;
+      TextView tvFormToggleIcon = ViewBindings.findChildViewById(rootView, id);
+      if (tvFormToggleIcon == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_form_toggle_title;
+      TextView tvFormToggleTitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvFormToggleTitle == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_reminders_message;
+      TextView tvRemindersMessage = ViewBindings.findChildViewById(rootView, id);
+      if (tvRemindersMessage == null) {
+        break missingId;
+      }
+
+      return new FragmentRemindersBinding((CoordinatorLayout) rootView, btnPickReminderDate,
+          btnSaveReminder, cvAddReminder, etReminderDueDate, etReminderTitle, layoutReminderFields,
+          layoutRemindersEmpty, layoutToggleForm, rvReminders, spinnerReminderPet,
+          spinnerReminderType, spinnerRemindersFilter, tvFormToggleIcon, tvFormToggleTitle,
+          tvRemindersMessage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

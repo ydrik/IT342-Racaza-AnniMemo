@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.g3.annimemo.MainActivity
 import com.g3.annimemo.core.data.TokenManager
-import com.g3.annimemo.core.databinding.ActivityLoginBinding
+import com.g3.annimemo.databinding.ActivityLoginBinding
 import com.g3.annimemo.core.network.LoginRequest
 import com.g3.annimemo.core.network.RetrofitClient
 import kotlinx.coroutines.Dispatchers
