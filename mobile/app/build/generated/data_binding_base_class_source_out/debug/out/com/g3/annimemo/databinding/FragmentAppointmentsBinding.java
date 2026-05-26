@@ -29,6 +29,9 @@ public final class FragmentAppointmentsBinding implements ViewBinding {
   public final AutoCompleteTextView actvAppointmentPet;
 
   @NonNull
+  public final Button btnBackToDashboard;
+
+  @NonNull
   public final ImageButton btnPickAppointmentDate;
 
   @NonNull
@@ -50,12 +53,14 @@ public final class FragmentAppointmentsBinding implements ViewBinding {
   public final RecyclerView rvAppointments;
 
   private FragmentAppointmentsBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull AutoCompleteTextView actvAppointmentPet, @NonNull ImageButton btnPickAppointmentDate,
-      @NonNull Button btnSaveAppointment, @NonNull CardView cvAddAppointment,
-      @NonNull EditText etAppointmentDate, @NonNull EditText etAppointmentReason,
-      @NonNull LinearLayout layoutAppointmentsEmpty, @NonNull RecyclerView rvAppointments) {
+      @NonNull AutoCompleteTextView actvAppointmentPet, @NonNull Button btnBackToDashboard,
+      @NonNull ImageButton btnPickAppointmentDate, @NonNull Button btnSaveAppointment,
+      @NonNull CardView cvAddAppointment, @NonNull EditText etAppointmentDate,
+      @NonNull EditText etAppointmentReason, @NonNull LinearLayout layoutAppointmentsEmpty,
+      @NonNull RecyclerView rvAppointments) {
     this.rootView = rootView;
     this.actvAppointmentPet = actvAppointmentPet;
+    this.btnBackToDashboard = btnBackToDashboard;
     this.btnPickAppointmentDate = btnPickAppointmentDate;
     this.btnSaveAppointment = btnSaveAppointment;
     this.cvAddAppointment = cvAddAppointment;
@@ -95,6 +100,12 @@ public final class FragmentAppointmentsBinding implements ViewBinding {
       id = R.id.actv_appointment_pet;
       AutoCompleteTextView actvAppointmentPet = ViewBindings.findChildViewById(rootView, id);
       if (actvAppointmentPet == null) {
+        break missingId;
+      }
+
+      id = R.id.btn_back_to_dashboard;
+      Button btnBackToDashboard = ViewBindings.findChildViewById(rootView, id);
+      if (btnBackToDashboard == null) {
         break missingId;
       }
 
@@ -141,8 +152,8 @@ public final class FragmentAppointmentsBinding implements ViewBinding {
       }
 
       return new FragmentAppointmentsBinding((CoordinatorLayout) rootView, actvAppointmentPet,
-          btnPickAppointmentDate, btnSaveAppointment, cvAddAppointment, etAppointmentDate,
-          etAppointmentReason, layoutAppointmentsEmpty, rvAppointments);
+          btnBackToDashboard, btnPickAppointmentDate, btnSaveAppointment, cvAddAppointment,
+          etAppointmentDate, etAppointmentReason, layoutAppointmentsEmpty, rvAppointments);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
