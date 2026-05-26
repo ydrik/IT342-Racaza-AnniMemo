@@ -116,6 +116,7 @@ class DashboardFragment : Fragment() {
             if (pets.isNotEmpty()) {
                 val intent = Intent(requireContext(), HealthMetricsActivity::class.java).apply {
                     putExtra("EXTRA_PET_ID", pets[0].id)
+                    putExtra("EXTRA_PET_DTO", pets[0])
                 }
                 startActivity(intent)
             } else {
@@ -278,6 +279,7 @@ class DashboardFragment : Fragment() {
                 populateAppointmentsUI()
                 populateHealthTrendsUI()
                 populateQuickAdjustmentsUI()
+                populateActiveCalendarDates()
 
                 // Default Calendar Agenda selection (Today)
                 val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -760,7 +762,7 @@ class DashboardFragment : Fragment() {
                             title = act.description,
                             subtitle = act.petName ?: "Care Event",
                             type = "Activity",
-                            icon = act.icon ?: "✅"
+                            icon = act.icon
                         )
                     )
                 }
@@ -796,6 +798,62 @@ class DashboardFragment : Fragment() {
         val type: String,
         val icon: String
     )
+
+    private fun populateActiveCalendarDates() {
+        binding.cgActiveDates.removeAllViews()
+        val uniqueDates = mutableSetOf<String>()
+        
+        // Reminders
+        remindersList.forEach {
+            if (!it.completed && !it.dueDate.isNullOrEmpty()) {
+                uniqueDates.add(it.dueDate!!)
+            }
+        }
+        
+        // Appointments
+        appointmentsList.forEach {
+            if (it.dateTime.isNotEmpty()) {
+                val datePart = it.dateTime.split(" ")[0].split("T")[0]
+                if (datePart.matches(Regex("\\d{4}-\\d{2}-\\d{2}"))) {
+                    uniqueDates.add(datePart)
+                }
+            }
+        }
+        
+        val sortedDates = uniqueDates.sorted()
+        if (sortedDates.isEmpty()) {
+            binding.layoutCalendarActiveDates.visibility = View.GONE
+            return
+        }
+        
+        binding.layoutCalendarActiveDates.visibility = View.VISIBLE
+        val sdfSource = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val sdfDisplay = SimpleDateFormat("MMM d", Locale.getDefault())
+        
+        sortedDates.forEach { dateStr ->
+            try {
+                val date = sdfSource.parse(dateStr) ?: return@forEach
+                val displayStr = sdfDisplay.format(date)
+                
+                val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                    text = "🟢 $displayStr"
+                    chipBackgroundColor = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.success_bg, null))
+                    setTextColor(resources.getColor(R.color.success, null))
+                    chipStrokeColor = android.content.res.ColorStateList.valueOf(resources.getColor(R.color.success, null))
+                    chipStrokeWidth = 3f
+                    isClickable = true
+                    
+                    setOnClickListener {
+                        binding.calendarView.date = date.time
+                        loadCalendarAgendaForDate(dateStr)
+                    }
+                }
+                binding.cgActiveDates.addView(chip)
+            } catch (e: Exception) {
+                // skip
+            }
+        }
+    }
 
     // Dynamic Lists Population
     private fun populateDueSoonUI() {
@@ -908,7 +966,7 @@ class DashboardFragment : Fragment() {
     private fun populateQuickAdjustmentsUI() {
         val settings = localStorageManager.getSettings()
         binding.tvAdjustmentsWindow.text = "Reminder window: ${settings.reminderWindowDays} day(s)"
-        binding.tvAdjustmentsSpecies.text = "Fact default species: ${settings.defaultFactSpecies.capitalize(Locale.getDefault())}"
+        binding.tvAdjustmentsSpecies.text = "Fact default species: ${settings.defaultFactSpecies.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}"
     }
 
     override fun onDestroyView() {

@@ -234,7 +234,7 @@ class AddPetActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val token = tokenManager.getToken()
             
-            val updatedDto = try {
+            try {
                 val api = RetrofitClient.create { token }
                 val response = if (isEditMode) {
                     api.updatePet(petId, requestDto)
@@ -243,7 +243,12 @@ class AddPetActivity : AppCompatActivity() {
                 }
                 
                 if (response.isSuccessful && response.body() != null) {
-                    response.body()!!
+                    val body = response.body()!!
+                    if (isEditMode) {
+                        localStorageManager.updatePet(petId, body)
+                    } else {
+                        localStorageManager.addPet(body)
+                    }
                 } else {
                     // Fallback to local
                     if (isEditMode) {

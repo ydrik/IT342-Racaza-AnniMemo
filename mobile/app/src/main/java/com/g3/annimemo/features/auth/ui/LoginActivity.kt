@@ -100,6 +100,20 @@ class LoginActivity : AppCompatActivity() {
                         val authResponse = response.body()!!
                         tokenManager.saveToken(authResponse.token)
                         
+                        val localStorage = com.g3.annimemo.core.data.LocalStorageManager(this@LoginActivity)
+                        val existingProfile = localStorage.getUserProfile(authResponse.username)
+                        if (existingProfile.username == "User" || existingProfile.username != authResponse.username) {
+                            localStorage.saveUserProfile(
+                                com.g3.annimemo.core.network.UserProfileDto(
+                                    username = authResponse.username,
+                                    firstName = authResponse.username,
+                                    lastName = "",
+                                    email = "${authResponse.username}@example.com",
+                                    role = "USER"
+                                )
+                            )
+                        }
+                        
                         // Navigate to MainActivity
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
