@@ -101,8 +101,8 @@ class LoginActivity : AppCompatActivity() {
                         tokenManager.saveToken(authResponse.token)
                         
                         val localStorage = com.g3.annimemo.core.data.LocalStorageManager(this@LoginActivity)
-                        val existingProfile = localStorage.getUserProfile(authResponse.username)
-                        if (existingProfile.username == "User" || existingProfile.username != authResponse.username) {
+                        val hasSavedProfile = this@LoginActivity.getSharedPreferences("annimemo_local_storage", android.content.Context.MODE_PRIVATE).contains("annimemo_user_profile")
+                        if (!hasSavedProfile) {
                             localStorage.saveUserProfile(
                                 com.g3.annimemo.core.network.UserProfileDto(
                                     username = authResponse.username,
@@ -112,6 +112,19 @@ class LoginActivity : AppCompatActivity() {
                                     role = "USER"
                                 )
                             )
+                        } else {
+                            val saved = localStorage.getUserProfile()
+                            if (saved.username != authResponse.username) {
+                                localStorage.saveUserProfile(
+                                    com.g3.annimemo.core.network.UserProfileDto(
+                                        username = authResponse.username,
+                                        firstName = authResponse.username,
+                                        lastName = "",
+                                        email = "${authResponse.username}@example.com",
+                                        role = "USER"
+                                    )
+                                )
+                            }
                         }
                         
                         // Navigate to MainActivity

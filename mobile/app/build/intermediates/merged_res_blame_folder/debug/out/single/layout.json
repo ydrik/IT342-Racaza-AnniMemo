@@ -8,24 +8,16 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\fragment_pets.xml"
     },
     {
-        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_dashboard.xml",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_dashboard.xml"
+        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_appointments.xml",
+        "source": "com.g3.annimemo.app-main-52:/layout/fragment_appointments.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\activity_main.xml",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_main.xml"
     },
     {
-        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_profile.xml",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_profile.xml"
-    },
-    {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\activity_add_pet.xml",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_add_pet.xml"
-    },
-    {
-        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/activity_add_pet.xml",
-        "source": "com.g3.annimemo.app-main-52:/layout/activity_add_pet.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\item_pet.xml",
@@ -34,10 +26,6 @@
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\item_reminder.xml",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\item_reminder.xml"
-    },
-    {
-        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_pets.xml",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_pets.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\item_activity.xml",
@@ -50,10 +38,6 @@
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\fragment_appointments.xml",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\fragment_appointments.xml"
-    },
-    {
-        "merged": "com.g3.annimemo.app-mergeDebugResources-49:/layout/fragment_explore_breeds.xml",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_explore_breeds.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-mergeDebugResources-49:\\layout\\item_appointment.xml",

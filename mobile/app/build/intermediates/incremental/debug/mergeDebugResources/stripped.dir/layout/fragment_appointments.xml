@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_app_gradient">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Top Header Navigation row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_back_to_dashboard"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="← Back to Dashboard"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Header Title Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🗓️ Appointments"
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Schedule and track vet clinic appointments"
+            android:textColor="@color/text_muted"
+            android:textSize="15sp" />
+
+        <!-- Add Appointment Form Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_add_appointment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🗓️ Schedule Appointment"
+                    android:textColor="@color/primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- Pet Name Autocomplete field -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Pet Name (suggestions while typing) *"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actv_appointment_pet"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:backgroundTint="@color/card_bg_surface"
+                    android:hint="Type letter (e.g. L for Lebron)"
+                    android:inputType="text"
+                    android:completionThreshold="1"
+                    android:paddingHorizontal="10dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+                <!-- Reason field -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Reason for Visit *"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_appointment_reason"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_button_secondary"
+                    android:backgroundTint="@color/card_bg_surface"
+                    android:hint="e.g. Annual vaccination checkup"
+                    android:inputType="text"
+                    android:paddingHorizontal="10dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+                <!-- Date selector -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Date &amp; Time"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/et_appointment_date"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_secondary"
+                        android:backgroundTint="@color/card_bg_surface"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:hint="yyyy-mm-dd"
+                        android:inputType="none"
+                        android:paddingHorizontal="10dp"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp" />
+
+                    <ImageButton
+                        android:id="@+id/btn_pick_appointment_date"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_gradient_primary"
+                        android:contentDescription="Select Date"
+                        android:src="@android:drawable/ic_menu_my_calendar"
+                        app:tint="@color/white" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_save_appointment"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_gradient_primary"
+                    android:text="Book Appointment"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@null" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Empty State view -->
+        <LinearLayout
+            android:id="@+id/layout_appointments_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🗓️"
+                android:textSize="64sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="No appointments scheduled"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Book a clinic visit above!"
+                android:textColor="@color/text_muted"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- RecyclerView list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_appointments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:clipToPadding="false"
+            android:paddingBottom="48dp"
+            tools:listitem="@layout/item_appointment" />
+
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
