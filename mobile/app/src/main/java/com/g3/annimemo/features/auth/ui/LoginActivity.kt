@@ -25,13 +25,6 @@ class LoginActivity : AppCompatActivity() {
         
         tokenManager = TokenManager(this)
         
-        // If already logged in, redirect to Main
-        if (tokenManager.getToken() != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-            return
-        }
-
         setupUI()
     }
 

@@ -20,16 +20,16 @@
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\drawable\\bg_app_gradient.xml"
     },
     {
-        "merged": "com.g3.annimemo.app-merged_res-50:/layout_fragment_appointments.xml.flat",
-        "source": "com.g3.annimemo.app-main-52:/layout/fragment_appointments.xml"
-    },
-    {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_activity_login.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_login.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_activity_register.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_register.xml"
+    },
+    {
+        "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_activity_landing.xml.flat",
+        "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_landing.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_item_appointment.xml.flat",
@@ -102,6 +102,10 @@
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_activity_add_pet.xml.flat",
         "source": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-main-52:\\layout\\activity_add_pet.xml"
+    },
+    {
+        "merged": "com.g3.annimemo.app-merged_res-50:/layout_activity_landing.xml.flat",
+        "source": "com.g3.annimemo.app-main-52:/layout/activity_landing.xml"
     },
     {
         "merged": "C:\\Users\\cfait\\.gradle\\daemon\\8.2\\com.g3.annimemo.app-merged_res-50:\\layout_fragment_dashboard.xml.flat",
