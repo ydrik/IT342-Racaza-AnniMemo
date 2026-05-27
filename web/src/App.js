@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import axios from 'axios';
+
+// Global Axios Request Interceptor to dynamically redirect localhost:8080 API requests
+// to the hosted backend specified in Vercel environment variables (REACT_APP_API_BASE_URL)
+axios.interceptors.request.use((config) => {
+    const apiBase = process.env.REACT_APP_API_BASE_URL;
+    if (apiBase && config.url && config.url.startsWith('http://localhost:8080')) {
+        const normalizedBase = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
+        config.url = config.url.replace('http://localhost:8080', normalizedBase);
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
 
 import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
