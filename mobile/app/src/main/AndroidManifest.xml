@@ -10,13 +10,14 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AnniMemo">
         <activity
-            android:name=".features.auth.ui.LoginActivity"
+            android:name=".features.auth.ui.LandingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".features.auth.ui.LoginActivity" />
         <activity android:name=".features.auth.ui.RegisterActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".features.pets.ui.AddPetActivity" />
