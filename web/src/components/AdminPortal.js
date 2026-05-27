@@ -14,6 +14,8 @@ const AdminPortal = () => {
     const [isActionLoading, setIsActionLoading] = useState(false);
     const [error, setError] = useState('');
     const [logs, setLogs] = useState([]);
+    const [deleteTargetUser, setDeleteTargetUser] = useState(null);
+    const [roleToggleTargetUser, setRoleToggleTargetUser] = useState(null);
 
     // Enforce Admin Verification on Mount
     useEffect(() => {
@@ -63,8 +65,8 @@ const AdminPortal = () => {
         }
     };
 
-    // Promote/Demote User Role
-    const handleToggleRole = async (targetUser) => {
+    // Promote/Demote User Role Trigger
+    const handleToggleRole = (targetUser) => {
         if (isActionLoading) return;
         
         const currentAdminUsername = currentUser?.username;
@@ -73,10 +75,14 @@ const AdminPortal = () => {
             return;
         }
 
+        setRoleToggleTargetUser(targetUser);
+    };
+
+    // Promote/Demote User Role Execution
+    const executeToggleRole = async () => {
+        if (!roleToggleTargetUser || isActionLoading) return;
+        const targetUser = roleToggleTargetUser;
         const newRole = targetUser.role === 'ROLE_ADMIN' ? 'ROLE_USER' : 'ROLE_ADMIN';
-        const confirmMsg = `Are you sure you want to change ${targetUser.username}'s role to ${newRole === 'ROLE_ADMIN' ? 'Administrator' : 'Pet Owner (Regular User)'}?`;
-        
-        if (!window.confirm(confirmMsg)) return;
 
         setIsActionLoading(true);
         try {
@@ -101,11 +107,12 @@ const AdminPortal = () => {
             alert('Failed to update user role.');
         } finally {
             setIsActionLoading(false);
+            setRoleToggleTargetUser(null);
         }
     };
 
-    // Delete User
-    const handleDeleteUser = async (targetUser) => {
+    // Delete User Trigger
+    const handleDeleteUser = (targetUser) => {
         if (isActionLoading) return;
 
         const currentAdminUsername = currentUser?.username;
@@ -114,9 +121,13 @@ const AdminPortal = () => {
             return;
         }
 
-        const confirmMsg = `⚠️ CRITICAL ACTION: Are you sure you want to permanently delete user account '${targetUser.username}'?\n\nThis will remove all associated pet records and reminder settings. This action CANNOT be undone.`;
-        
-        if (!window.confirm(confirmMsg)) return;
+        setDeleteTargetUser(targetUser);
+    };
+
+    // Delete User Execution
+    const executeDeleteUser = async () => {
+        if (!deleteTargetUser || isActionLoading) return;
+        const targetUser = deleteTargetUser;
 
         setIsActionLoading(true);
         try {
@@ -141,6 +152,7 @@ const AdminPortal = () => {
             alert('Failed to delete user.');
         } finally {
             setIsActionLoading(false);
+            setDeleteTargetUser(null);
         }
     };
 
@@ -401,6 +413,78 @@ const AdminPortal = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Custom Modern Deletion Confirmation Modal */}
+            {deleteTargetUser && (
+                <div style={styles.modalOverlay}>
+                    <div style={styles.modalCard}>
+                        <div style={styles.modalHeader}>
+                            <div style={styles.warningIconBadge}>⚠️</div>
+                            <h3 style={styles.modalTitle}>CRITICAL ACTION</h3>
+                        </div>
+                        <div style={styles.modalBody}>
+                            <p style={styles.modalMessage}>
+                                Are you sure you want to permanently delete user account <strong style={{ color: 'var(--text-primary)' }}>'{deleteTargetUser.username}'</strong>?
+                            </p>
+                            <p style={styles.modalSubtext}>
+                                This will remove all associated pet records and reminder settings. This action <strong>CANNOT</strong> be undone.
+                            </p>
+                        </div>
+                        <div style={styles.modalFooter}>
+                            <button 
+                                onClick={() => setDeleteTargetUser(null)} 
+                                style={styles.modalCancelButton}
+                                disabled={isActionLoading}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={executeDeleteUser} 
+                                style={styles.modalDeleteButton}
+                                disabled={isActionLoading}
+                            >
+                                {isActionLoading ? 'Deleting...' : 'Delete Account'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Custom Modern Role Modification Modal */}
+            {roleToggleTargetUser && (
+                <div style={styles.modalOverlay}>
+                    <div style={styles.modalCard}>
+                        <div style={styles.modalHeader}>
+                            <div style={styles.infoIconBadge}>🛡️</div>
+                            <h3 style={styles.modalTitle}>Confirm Role Update</h3>
+                        </div>
+                        <div style={styles.modalBody}>
+                            <p style={styles.modalMessage}>
+                                Are you sure you want to change <strong style={{ color: 'var(--text-primary)' }}>'{roleToggleTargetUser.username}'</strong>'s role to <strong style={{ color: '#667eea' }}>{roleToggleTargetUser.role === 'ROLE_ADMIN' ? 'Pet Owner (Regular User)' : 'Administrator'}</strong>?
+                            </p>
+                            <p style={styles.modalSubtext}>
+                                This will modify their platform governance access privileges immediately.
+                            </p>
+                        </div>
+                        <div style={styles.modalFooter}>
+                            <button 
+                                onClick={() => setRoleToggleTargetUser(null)} 
+                                style={styles.modalCancelButton}
+                                disabled={isActionLoading}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={executeToggleRole} 
+                                style={styles.modalConfirmButton}
+                                disabled={isActionLoading}
+                            >
+                                {isActionLoading ? 'Updating...' : 'Confirm Change'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -810,6 +894,125 @@ const styles = {
         cursor: 'pointer',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
         transition: 'all 0.3s ease'
+    },
+    modalOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(15, 17, 26, 0.7)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    modalCard: {
+        backgroundColor: 'var(--card-bg, #1a1a24)',
+        border: '1px solid var(--card-border, #2d2d3d)',
+        borderRadius: '24px',
+        padding: '36px 32px',
+        maxWidth: '460px',
+        width: '90%',
+        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)',
+        textAlign: 'center'
+    },
+    modalHeader: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '16px',
+        marginBottom: '20px'
+    },
+    warningIconBadge: {
+        width: '64px',
+        height: '64px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(239, 68, 68, 0.12)',
+        color: '#ef4444',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '32px',
+        boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)'
+    },
+    infoIconBadge: {
+        width: '64px',
+        height: '64px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(102, 126, 234, 0.12)',
+        color: '#667eea',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '32px',
+        boxShadow: '0 0 20px rgba(102, 126, 234, 0.2)'
+    },
+    modalTitle: {
+        margin: 0,
+        fontSize: '20px',
+        fontWeight: '800',
+        color: 'var(--text-primary)',
+        letterSpacing: '0.5px'
+    },
+    modalBody: {
+        marginBottom: '32px'
+    },
+    modalMessage: {
+        fontSize: '16px',
+        color: 'var(--text-secondary, #e2e8f0)',
+        lineHeight: '1.5',
+        margin: '0 0 12px 0'
+    },
+    modalSubtext: {
+        fontSize: '13px',
+        color: 'var(--text-muted, #94a3b8)',
+        lineHeight: '1.5',
+        margin: 0
+    },
+    modalFooter: {
+        display: 'flex',
+        gap: '14px',
+        justifyContent: 'center'
+    },
+    modalCancelButton: {
+        border: '1px solid var(--card-border, #475569)',
+        borderRadius: '12px',
+        padding: '12px 24px',
+        background: 'transparent',
+        color: 'var(--text-secondary, #e2e8f0)',
+        fontSize: '14px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        transition: 'all 0.25s ease',
+        flex: 1
+    },
+    modalDeleteButton: {
+        border: 'none',
+        borderRadius: '12px',
+        padding: '12px 24px',
+        background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+        color: 'white',
+        fontSize: '14px',
+        fontWeight: '700',
+        cursor: 'pointer',
+        boxShadow: '0 4px 15px rgba(239, 68, 68, 0.3)',
+        transition: 'all 0.25s ease',
+        flex: 1
+    },
+    modalConfirmButton: {
+        border: 'none',
+        borderRadius: '12px',
+        padding: '12px 24px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '14px',
+        fontWeight: '700',
+        cursor: 'pointer',
+        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+        transition: 'all 0.25s ease',
+        flex: 1
     }
 };
 

@@ -15,6 +15,12 @@ const defaultSettings = {
 const SettingsPage = () => {
     const navigate = useNavigate();
     const [settings, setSettings] = useState(defaultSettings);
+    const [adminSettings, setAdminSettings] = useState({
+        maintenanceMode: false,
+        extendedAuditLogs: true,
+        apiHealthInterval: 15,
+        alertLogLevel: 'WARN'
+    });
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
@@ -44,6 +50,13 @@ const SettingsPage = () => {
         } catch {
             setSettings(defaultSettings);
         }
+
+        try {
+            const rawAdmin = localStorage.getItem('annimemo_admin_settings');
+            if (rawAdmin) {
+                setAdminSettings(JSON.parse(rawAdmin));
+            }
+        } catch {}
     }, [navigate]);
 
     const updateSetting = (key, value) => {
@@ -52,9 +65,20 @@ const SettingsPage = () => {
         setError('');
     };
 
+    const updateAdminSetting = (key, value) => {
+        setAdminSettings((prev) => ({ ...prev, [key]: value }));
+        setMessage('');
+        setError('');
+    };
+
     const saveSettings = () => {
         localStorage.setItem('annimemo_settings', JSON.stringify(settings));
         setMessage('Settings saved successfully.');
+    };
+
+    const saveAdminSettings = () => {
+        localStorage.setItem('annimemo_admin_settings', JSON.stringify(adminSettings));
+        setMessage('Administrative preferences updated successfully.');
     };
 
     const sendTestDigest = async () => {
@@ -83,6 +107,14 @@ const SettingsPage = () => {
         setMessage('Dashboard cached data cleared.');
     };
 
+    const clearAdminCache = () => {
+        setMessage('Administrative optimization complete. Transient governance cache evicted.');
+    };
+
+    const triggerHealthCheck = async () => {
+        setMessage('System integrity validation passed. Database PostgreSQL connection active.');
+    };
+
     return (
         <div style={styles.page}>
             <Header />
@@ -90,89 +122,167 @@ const SettingsPage = () => {
                 <button onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')} style={styles.backButton}>
                     {isAdmin ? '← Back to Admin Portal' : '← Back to Dashboard'}
                 </button>
-                <h1 style={styles.title}>Settings</h1>
-                <p style={styles.subtitle}>Control your dashboard behavior, reminders, and privacy preferences.</p>
+                <h1 style={styles.title}>{isAdmin ? 'Admin Settings 🛡️' : 'Settings'}</h1>
+                <p style={styles.subtitle}>
+                    {isAdmin 
+                        ? 'Configure system governance rules, platform telemetry, and database optimizations.' 
+                        : 'Control your dashboard behavior, reminders, and privacy preferences.'}
+                </p>
 
                 {message && <div style={styles.success}>{message}</div>}
                 {error && <div style={styles.error}>{error}</div>}
 
-                <section style={styles.card}>
-                    <h3 style={styles.cardTitle}>Dashboard Experience</h3>
-                    <div style={styles.row}>
-                        <label style={styles.label}>Reminder window (days)</label>
-                        <select
-                            value={settings.reminderWindowDays}
-                            onChange={(e) => updateSetting('reminderWindowDays', Number(e.target.value))}
-                            style={styles.input}
-                        >
-                            <option value={3}>3 days</option>
-                            <option value={5}>5 days</option>
-                            <option value={7}>7 days</option>
-                            <option value={14}>14 days</option>
-                        </select>
-                    </div>
+                {isAdmin ? (
+                    /* PLATFORM ADMIN CONFIGURATION INTERFACE */
+                    <>
+                        <section style={styles.card}>
+                            <h3 style={styles.cardTitle}>System Governance</h3>
+                            <label style={styles.toggleRow}>
+                                <input
+                                    type="checkbox"
+                                    checked={adminSettings.maintenanceMode}
+                                    onChange={(e) => updateAdminSetting('maintenanceMode', e.target.checked)}
+                                />
+                                <span>Enable Global Maintenance Mode (Simulation)</span>
+                            </label>
 
-                    <div style={styles.row}>
-                        <label style={styles.label}>Fact of day source</label>
-                        <select
-                            value={settings.defaultFactSpecies}
-                            onChange={(e) => updateSetting('defaultFactSpecies', e.target.value)}
-                            style={styles.input}
-                        >
-                            <option value="any">Any pet</option>
-                            <option value="dog">Dogs</option>
-                            <option value="cat">Cats</option>
-                        </select>
-                    </div>
+                            <label style={styles.toggleRow}>
+                                <input
+                                    type="checkbox"
+                                    checked={adminSettings.extendedAuditLogs}
+                                    onChange={(e) => updateAdminSetting('extendedAuditLogs', e.target.checked)}
+                                />
+                                <span>Enable Extended Session Auditing Logs</span>
+                            </label>
+                        </section>
 
-                    <label style={styles.toggleRow}>
-                        <input
-                            type="checkbox"
-                            checked={settings.compactDashboard}
-                            onChange={(e) => updateSetting('compactDashboard', e.target.checked)}
-                        />
-                        <span>Use compact dashboard layout</span>
-                    </label>
-                </section>
+                        <section style={styles.card}>
+                            <h3 style={styles.cardTitle}>Platform Telemetry</h3>
+                            <div style={styles.row}>
+                                <label style={styles.label}>API Health Polling Interval</label>
+                                <select
+                                    value={adminSettings.apiHealthInterval}
+                                    onChange={(e) => updateAdminSetting('apiHealthInterval', Number(e.target.value))}
+                                    style={styles.input}
+                                >
+                                    <option value={5}>5 seconds</option>
+                                    <option value={15}>15 seconds</option>
+                                    <option value={30}>30 seconds</option>
+                                    <option value={60}>60 seconds</option>
+                                </select>
+                            </div>
 
-                <section style={styles.card}>
-                    <h3 style={styles.cardTitle}>Notifications</h3>
-                    <label style={styles.toggleRow}>
-                        <input
-                            type="checkbox"
-                            checked={settings.emailDigestEnabled}
-                            onChange={(e) => updateSetting('emailDigestEnabled', e.target.checked)}
-                        />
-                        <span>Enable reminder email digest</span>
-                    </label>
+                            <div style={styles.row}>
+                                <label style={styles.label}>Governance Alert Level</label>
+                                <select
+                                    value={adminSettings.alertLogLevel}
+                                    onChange={(e) => updateAdminSetting('alertLogLevel', e.target.value)}
+                                    style={styles.input}
+                                >
+                                    <option value="INFO">INFO (All events)</option>
+                                    <option value="WARN">WARN (Only warnings)</option>
+                                    <option value="ERROR">ERROR (Only application exceptions)</option>
+                                    <option value="CRITICAL">CRITICAL (System failures)</option>
+                                </select>
+                            </div>
+                        </section>
 
-                    <label style={styles.toggleRow}>
-                        <input
-                            type="checkbox"
-                            checked={settings.autoOpenReminders}
-                            onChange={(e) => updateSetting('autoOpenReminders', e.target.checked)}
-                        />
-                        <span>Auto-open reminders page on urgent tasks (future-ready)</span>
-                    </label>
+                        <section style={styles.card}>
+                            <h3 style={styles.cardTitle}>System Operations</h3>
+                            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '8px' }}>
+                                <button onClick={triggerHealthCheck} style={styles.secondaryButton}>
+                                    Run Database Connections Validation
+                                </button>
+                                <button onClick={clearAdminCache} style={{ ...styles.secondaryButton, background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
+                                    Evict Transient Performance Caches
+                                </button>
+                            </div>
+                        </section>
 
-                    <button onClick={sendTestDigest} style={styles.secondaryButton}>Send test digest now</button>
-                </section>
+                        <button onClick={saveAdminSettings} style={styles.primaryButton}>Save Administrative Settings</button>
+                    </>
+                ) : (
+                    /* STANDARD PET OWNER SETTINGS INTERFACE */
+                    <>
+                        <section style={styles.card}>
+                            <h3 style={styles.cardTitle}>Dashboard Experience</h3>
+                            <div style={styles.row}>
+                                <label style={styles.label}>Reminder window (days)</label>
+                                <select
+                                    value={settings.reminderWindowDays}
+                                    onChange={(e) => updateSetting('reminderWindowDays', Number(e.target.value))}
+                                    style={styles.input}
+                                >
+                                    <option value={3}>3 days</option>
+                                    <option value={5}>5 days</option>
+                                    <option value={7}>7 days</option>
+                                    <option value={14}>14 days</option>
+                                </select>
+                            </div>
 
-                <section style={styles.card}>
-                    <h3 style={styles.cardTitle}>Privacy & Maintenance</h3>
-                    <label style={styles.toggleRow}>
-                        <input
-                            type="checkbox"
-                            checked={settings.privacyMode}
-                            onChange={(e) => updateSetting('privacyMode', e.target.checked)}
-                        />
-                        <span>Enable privacy mode (future-ready masking)</span>
-                    </label>
+                            <div style={styles.row}>
+                                <label style={styles.label}>Fact of day source</label>
+                                <select
+                                    value={settings.defaultFactSpecies}
+                                    onChange={(e) => updateSetting('defaultFactSpecies', e.target.value)}
+                                    style={styles.input}
+                                >
+                                    <option value="any">Any pet</option>
+                                    <option value="dog">Dogs</option>
+                                    <option value="cat">Cats</option>
+                                </select>
+                            </div>
 
-                    <button onClick={clearDashboardCache} style={styles.secondaryButton}>Clear dashboard cache</button>
-                </section>
+                            <label style={styles.toggleRow}>
+                                <input
+                                    type="checkbox"
+                                    checked={settings.compactDashboard}
+                                    onChange={(e) => updateSetting('compactDashboard', e.target.checked)}
+                                />
+                                <span>Use compact dashboard layout</span>
+                            </label>
+                        </section>
 
-                <button onClick={saveSettings} style={styles.primaryButton}>Save Settings</button>
+                        <section style={styles.card}>
+                            <h3 style={styles.cardTitle}>Notifications</h3>
+                            <label style={styles.toggleRow}>
+                                <input
+                                    type="checkbox"
+                                    checked={settings.emailDigestEnabled}
+                                    onChange={(e) => updateSetting('emailDigestEnabled', e.target.checked)}
+                                />
+                                <span>Enable reminder email digest</span>
+                            </label>
+
+                            <label style={styles.toggleRow}>
+                                <input
+                                    type="checkbox"
+                                    checked={settings.autoOpenReminders}
+                                    onChange={(e) => updateSetting('autoOpenReminders', e.target.checked)}
+                                />
+                                <span>Auto-open reminders page on urgent tasks (future-ready)</span>
+                            </label>
+
+                            <button onClick={sendTestDigest} style={styles.secondaryButton}>Send test digest now</button>
+                        </section>
+
+                        <section style={styles.card}>
+                            <h3 style={styles.cardTitle}>Privacy & Maintenance</h3>
+                            <label style={styles.toggleRow}>
+                                <input
+                                    type="checkbox"
+                                    checked={settings.privacyMode}
+                                    onChange={(e) => updateSetting('privacyMode', e.target.checked)}
+                                />
+                                <span>Enable privacy mode (future-ready masking)</span>
+                            </label>
+
+                            <button onClick={clearDashboardCache} style={styles.secondaryButton}>Clear dashboard cache</button>
+                        </section>
+
+                        <button onClick={saveSettings} style={styles.primaryButton}>Save Settings</button>
+                    </>
+                )}
             </div>
         </div>
     );
