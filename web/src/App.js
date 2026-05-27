@@ -5,6 +5,7 @@ import LoginPage from './features/auth/pages/LoginPage';
 import RegisterPage from './features/auth/pages/RegisterPage';
 
 // Import components for routing
+import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import PetList from './components/PetList';
 import AddPet from './components/AddPet';
@@ -44,7 +45,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         
