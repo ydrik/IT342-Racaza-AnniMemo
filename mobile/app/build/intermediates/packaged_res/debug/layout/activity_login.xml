@@ -14,8 +14,8 @@
         <View
             android:id="@+id/header_background"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@drawable/bg_gradient_primary"
+            android:layout_height="260dp"
+            android:background="@drawable/bg_login_header"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -33,13 +33,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/iv_logo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_launcher_foreground"
-                android:scaleType="centerInside"
-                app:tint="@color/primary" />
+            <TextView
+                android:id="@+id/tv_logo_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="🐾"
+                android:textSize="36sp" />
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Title -->

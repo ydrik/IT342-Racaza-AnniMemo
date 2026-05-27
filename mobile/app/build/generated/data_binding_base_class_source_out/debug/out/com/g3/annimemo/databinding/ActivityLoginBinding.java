@@ -4,7 +4,6 @@ package com.g3.annimemo.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -44,9 +43,6 @@ public final class ActivityLoginBinding implements ViewBinding {
   public final View headerBackground;
 
   @NonNull
-  public final ImageView ivLogo;
-
-  @NonNull
   public final ProgressBar loadingIndicator;
 
   @NonNull
@@ -62,6 +58,9 @@ public final class ActivityLoginBinding implements ViewBinding {
   public final TextInputLayout tilPassword;
 
   @NonNull
+  public final TextView tvLogoEmoji;
+
+  @NonNull
   public final TextView tvRegisterRedirect;
 
   @NonNull
@@ -73,10 +72,10 @@ public final class ActivityLoginBinding implements ViewBinding {
   private ActivityLoginBinding(@NonNull ScrollView rootView, @NonNull MaterialButton btnLogin,
       @NonNull MaterialCardView errorContainer, @NonNull TextView errorMessage,
       @NonNull TextInputEditText etIdentifier, @NonNull TextInputEditText etPassword,
-      @NonNull View headerBackground, @NonNull ImageView ivLogo,
-      @NonNull ProgressBar loadingIndicator, @NonNull MaterialCardView loginCard,
-      @NonNull MaterialCardView logoCard, @NonNull TextInputLayout tilIdentifier,
-      @NonNull TextInputLayout tilPassword, @NonNull TextView tvRegisterRedirect,
+      @NonNull View headerBackground, @NonNull ProgressBar loadingIndicator,
+      @NonNull MaterialCardView loginCard, @NonNull MaterialCardView logoCard,
+      @NonNull TextInputLayout tilIdentifier, @NonNull TextInputLayout tilPassword,
+      @NonNull TextView tvLogoEmoji, @NonNull TextView tvRegisterRedirect,
       @NonNull TextView tvSubtitle, @NonNull TextView tvTitle) {
     this.rootView = rootView;
     this.btnLogin = btnLogin;
@@ -85,12 +84,12 @@ public final class ActivityLoginBinding implements ViewBinding {
     this.etIdentifier = etIdentifier;
     this.etPassword = etPassword;
     this.headerBackground = headerBackground;
-    this.ivLogo = ivLogo;
     this.loadingIndicator = loadingIndicator;
     this.loginCard = loginCard;
     this.logoCard = logoCard;
     this.tilIdentifier = tilIdentifier;
     this.tilPassword = tilPassword;
+    this.tvLogoEmoji = tvLogoEmoji;
     this.tvRegisterRedirect = tvRegisterRedirect;
     this.tvSubtitle = tvSubtitle;
     this.tvTitle = tvTitle;
@@ -159,12 +158,6 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.iv_logo;
-      ImageView ivLogo = ViewBindings.findChildViewById(rootView, id);
-      if (ivLogo == null) {
-        break missingId;
-      }
-
       id = R.id.loading_indicator;
       ProgressBar loadingIndicator = ViewBindings.findChildViewById(rootView, id);
       if (loadingIndicator == null) {
@@ -195,6 +188,12 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tv_logo_emoji;
+      TextView tvLogoEmoji = ViewBindings.findChildViewById(rootView, id);
+      if (tvLogoEmoji == null) {
+        break missingId;
+      }
+
       id = R.id.tv_register_redirect;
       TextView tvRegisterRedirect = ViewBindings.findChildViewById(rootView, id);
       if (tvRegisterRedirect == null) {
@@ -214,8 +213,8 @@ public final class ActivityLoginBinding implements ViewBinding {
       }
 
       return new ActivityLoginBinding((ScrollView) rootView, btnLogin, errorContainer, errorMessage,
-          etIdentifier, etPassword, headerBackground, ivLogo, loadingIndicator, loginCard, logoCard,
-          tilIdentifier, tilPassword, tvRegisterRedirect, tvSubtitle, tvTitle);
+          etIdentifier, etPassword, headerBackground, loadingIndicator, loginCard, logoCard,
+          tilIdentifier, tilPassword, tvLogoEmoji, tvRegisterRedirect, tvSubtitle, tvTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

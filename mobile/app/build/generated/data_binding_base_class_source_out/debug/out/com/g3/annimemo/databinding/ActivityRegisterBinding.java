@@ -4,7 +4,6 @@ package com.g3.annimemo.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -53,9 +52,6 @@ public final class ActivityRegisterBinding implements ViewBinding {
   public final View headerBackground;
 
   @NonNull
-  public final ImageView ivLogo;
-
-  @NonNull
   public final ProgressBar loadingIndicator;
 
   @NonNull
@@ -89,6 +85,9 @@ public final class ActivityRegisterBinding implements ViewBinding {
   public final TextView tvLoginRedirect;
 
   @NonNull
+  public final TextView tvLogoEmoji;
+
+  @NonNull
   public final TextView tvSubtitle;
 
   @NonNull
@@ -99,12 +98,12 @@ public final class ActivityRegisterBinding implements ViewBinding {
       @NonNull TextInputEditText etEmail, @NonNull TextInputEditText etFirstName,
       @NonNull TextInputEditText etLastName, @NonNull TextInputEditText etPassword,
       @NonNull TextInputEditText etUsername, @NonNull View headerBackground,
-      @NonNull ImageView ivLogo, @NonNull ProgressBar loadingIndicator,
-      @NonNull MaterialCardView logoCard, @NonNull MaterialCardView registerCard,
-      @NonNull MaterialCardView successContainer, @NonNull TextView successMessage,
-      @NonNull TextInputLayout tilEmail, @NonNull TextInputLayout tilFirstName,
-      @NonNull TextInputLayout tilLastName, @NonNull TextInputLayout tilPassword,
-      @NonNull TextInputLayout tilUsername, @NonNull TextView tvLoginRedirect,
+      @NonNull ProgressBar loadingIndicator, @NonNull MaterialCardView logoCard,
+      @NonNull MaterialCardView registerCard, @NonNull MaterialCardView successContainer,
+      @NonNull TextView successMessage, @NonNull TextInputLayout tilEmail,
+      @NonNull TextInputLayout tilFirstName, @NonNull TextInputLayout tilLastName,
+      @NonNull TextInputLayout tilPassword, @NonNull TextInputLayout tilUsername,
+      @NonNull TextView tvLoginRedirect, @NonNull TextView tvLogoEmoji,
       @NonNull TextView tvSubtitle, @NonNull TextView tvTitle) {
     this.rootView = rootView;
     this.btnRegister = btnRegister;
@@ -116,7 +115,6 @@ public final class ActivityRegisterBinding implements ViewBinding {
     this.etPassword = etPassword;
     this.etUsername = etUsername;
     this.headerBackground = headerBackground;
-    this.ivLogo = ivLogo;
     this.loadingIndicator = loadingIndicator;
     this.logoCard = logoCard;
     this.registerCard = registerCard;
@@ -128,6 +126,7 @@ public final class ActivityRegisterBinding implements ViewBinding {
     this.tilPassword = tilPassword;
     this.tilUsername = tilUsername;
     this.tvLoginRedirect = tvLoginRedirect;
+    this.tvLogoEmoji = tvLogoEmoji;
     this.tvSubtitle = tvSubtitle;
     this.tvTitle = tvTitle;
   }
@@ -213,12 +212,6 @@ public final class ActivityRegisterBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.iv_logo;
-      ImageView ivLogo = ViewBindings.findChildViewById(rootView, id);
-      if (ivLogo == null) {
-        break missingId;
-      }
-
       id = R.id.loading_indicator;
       ProgressBar loadingIndicator = ViewBindings.findChildViewById(rootView, id);
       if (loadingIndicator == null) {
@@ -285,6 +278,12 @@ public final class ActivityRegisterBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tv_logo_emoji;
+      TextView tvLogoEmoji = ViewBindings.findChildViewById(rootView, id);
+      if (tvLogoEmoji == null) {
+        break missingId;
+      }
+
       id = R.id.tv_subtitle;
       TextView tvSubtitle = ViewBindings.findChildViewById(rootView, id);
       if (tvSubtitle == null) {
@@ -299,8 +298,8 @@ public final class ActivityRegisterBinding implements ViewBinding {
 
       return new ActivityRegisterBinding((ScrollView) rootView, btnRegister, errorContainer,
           errorMessage, etEmail, etFirstName, etLastName, etPassword, etUsername, headerBackground,
-          ivLogo, loadingIndicator, logoCard, registerCard, successContainer, successMessage,
-          tilEmail, tilFirstName, tilLastName, tilPassword, tilUsername, tvLoginRedirect,
+          loadingIndicator, logoCard, registerCard, successContainer, successMessage, tilEmail,
+          tilFirstName, tilLastName, tilPassword, tilUsername, tvLoginRedirect, tvLogoEmoji,
           tvSubtitle, tvTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
