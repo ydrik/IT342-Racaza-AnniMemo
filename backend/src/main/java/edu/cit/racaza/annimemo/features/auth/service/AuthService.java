@@ -42,10 +42,14 @@ public class AuthService {
                 normalizedEmail
         );
 
+        if (normalizedUsername.equalsIgnoreCase("admin") || normalizedUsername.equalsIgnoreCase("annimemo_admin")) {
+            user.setRole("ROLE_ADMIN");
+        }
+
         appUserRepository.save(user);
 
         String token = generateToken(user.getUsername());
-        return new AuthResponse("User registered successfully", token, user.getUsername());
+        return new AuthResponse("User registered successfully", token, user.getUsername(), user.getRole());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -60,7 +64,7 @@ public class AuthService {
         }
 
         String token = generateToken(user.getUsername());
-        return new AuthResponse("Login successful", token, user.getUsername());
+        return new AuthResponse("Login successful", token, user.getUsername(), user.getRole());
     }
 
     private String generateToken(String username) {

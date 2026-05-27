@@ -23,12 +23,18 @@ const LoginPage = () => {
             const response = await axios.post('http://localhost:8080/api/auth/login', credentials);
             
             if (response.status === 200) {
-                // Activity Diagram: Generate and store Session Token (JWT)
                 const token = response.data.token;
-                localStorage.setItem('token', token);
+                const role = response.data.role || 'ROLE_USER';
+                const username = response.data.username;
                 
-                // Activity Diagram: Redirect to Dashboard
-                navigate('/dashboard');
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify({ token, username, role }));
+                
+                if (role === 'ROLE_ADMIN') {
+                    navigate('/admin');
+                } else {
+                    navigate('/dashboard');
+                }
             }
         } catch (err) {
             // Activity Diagram: Show authentication error
