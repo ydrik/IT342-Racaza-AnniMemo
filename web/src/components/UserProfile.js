@@ -27,24 +27,53 @@ const UserProfile = () => {
         confirmPassword: ''
     });
 
+    const [isAdmin, setIsAdmin] = useState(false);
+
     useEffect(() => {
-        // Check authentication
         const token = localStorage.getItem('token');
         if (!token) {
             navigate('/login');
             return;
         }
 
-        // FRS Requirement: View Profile Information
-        // Simulate fetching user profile data
-        // In production: GET /api/users/profile with Authorization header
-        const mockUserData = {
-            username: 'johndoe',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'john.doe@example.com'
+        const fetchUserProfile = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/auth/me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                
+                if (response.status === 200) {
+                    const userData = response.data;
+                    setProfileData({
+                        username: userData.username || '',
+                        firstName: userData.firstName || '',
+                        lastName: userData.lastName || '',
+                        email: userData.email || ''
+                    });
+                    setIsAdmin(userData.role === 'ROLE_ADMIN');
+                }
+            } catch (err) {
+                const rawUser = localStorage.getItem('user');
+                if (rawUser) {
+                    try {
+                        const cached = JSON.parse(rawUser);
+                        setProfileData({
+                            username: cached.username || 'admin',
+                            firstName: 'System',
+                            lastName: 'Administrator',
+                            email: 'admin@annimemo.com'
+                        });
+                        setIsAdmin(cached.role === 'ROLE_ADMIN');
+                    } catch {
+                        navigate('/login');
+                    }
+                } else {
+                    navigate('/login');
+                }
+            }
         };
-        setProfileData(mockUserData);
+
+        fetchUserProfile();
         setProfileImage(localStorage.getItem('profileImage') || '');
     }, [navigate]);
 
@@ -185,8 +214,8 @@ const UserProfile = () => {
         <div style={styles.pageContainer}>
             <div style={styles.container}>
                 <div style={styles.headerSection}>
-                    <button onClick={() => navigate('/dashboard')} style={styles.backButton}>
-                        ← Back to Dashboard
+                    <button onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')} style={styles.backButton}>
+                        {isAdmin ? '← Back to Admin Portal' : '← Back to Dashboard'}
                     </button>
                     <h1 style={styles.title}>My Profile 👤</h1>
                     <p style={styles.subtitle}>View and manage your account information</p>

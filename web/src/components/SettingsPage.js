@@ -18,11 +18,21 @@ const SettingsPage = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
+    const [isAdmin, setIsAdmin] = useState(false);
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) {
             navigate('/login');
             return;
+        }
+
+        const rawUser = localStorage.getItem('user');
+        if (rawUser) {
+            try {
+                const user = JSON.parse(rawUser);
+                setIsAdmin(user.role === 'ROLE_ADMIN');
+            } catch {}
         }
 
         try {
@@ -77,7 +87,9 @@ const SettingsPage = () => {
         <div style={styles.page}>
             <Header />
             <div style={styles.container}>
-                <button onClick={() => navigate('/dashboard')} style={styles.backButton}>← Back to Dashboard</button>
+                <button onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')} style={styles.backButton}>
+                    {isAdmin ? '← Back to Admin Portal' : '← Back to Dashboard'}
+                </button>
                 <h1 style={styles.title}>Settings</h1>
                 <p style={styles.subtitle}>Control your dashboard behavior, reminders, and privacy preferences.</p>
 

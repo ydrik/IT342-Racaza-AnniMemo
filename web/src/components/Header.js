@@ -208,7 +208,7 @@ const Header = () => {
     return (
         <header style={styles.navbar}>
             <div style={styles.navbarContent}>
-                <div style={styles.navbarBrand} onClick={() => navigate('/dashboard')}>
+                <div style={styles.navbarBrand} onClick={() => navigate(isAdmin ? '/admin' : '/dashboard')}>
                     <h2 style={styles.brandTitle}>🐾 AnniMemo</h2>
                 </div>
 

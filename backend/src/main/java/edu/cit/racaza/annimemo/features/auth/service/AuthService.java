@@ -67,6 +67,11 @@ public class AuthService {
         return new AuthResponse("Login successful", token, user.getUsername(), user.getRole());
     }
 
+    public AppUser getUserByUsername(String username) {
+        return appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new AuthException("User not found"));
+    }
+
     private String generateToken(String username) {
         String raw = username + ":" + Instant.now().toEpochMilli();
         return Base64.getUrlEncoder()

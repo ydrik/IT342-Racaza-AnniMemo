@@ -4,13 +4,19 @@ import edu.cit.racaza.annimemo.features.auth.dto.AuthResponse;
 import edu.cit.racaza.annimemo.features.auth.dto.LoginRequest;
 import edu.cit.racaza.annimemo.features.auth.dto.RegisterRequest;
 import edu.cit.racaza.annimemo.features.auth.service.AuthService;
+import edu.cit.racaza.annimemo.features.auth.model.AppUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,5 +36,24 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Missing or invalid Authorization header"));
+        }
+        
+        try {
+            String token = authHeader.replace("Bearer ", "").trim();
+            byte[] decoded = Base64.getUrlDecoder().decode(token);
+            String raw = new String(decoded, StandardCharsets.UTF_8);
+            String username = raw.split(":")[0];
+            
+            AppUser user = authService.getUserByUsername(username);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid or expired session token"));
+        }
     }
 }
