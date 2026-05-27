@@ -30,6 +30,9 @@ public class AppUser {
     @Column(nullable = false, unique = true, length = 120)
     private String email;
 
+    @Column(nullable = true, length = 20)
+    private String role = "ROLE_USER";
+
     protected AppUser() {
     }
 
@@ -39,6 +42,7 @@ public class AppUser {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.role = "ROLE_USER";
     }
 
     public Long getId() {
@@ -63,5 +67,13 @@ public class AppUser {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getRole() {
+        return role != null ? role : "ROLE_USER";
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

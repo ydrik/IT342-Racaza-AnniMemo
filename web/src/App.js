@@ -23,6 +23,7 @@ import Footer from './components/Footer';
 import ThemeToggle from './components/ThemeToggle';
 import AppointmentTrackerPage from './components/AppointmentTrackerPage';
 import ExploreBreeds from './components/ExploreBreeds';
+import AdminPortal from './components/AdminPortal';
 
 function App() {
   const [theme, setTheme] = useState(() => {
@@ -50,6 +51,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         
         {/* Protected Routes */}
+        <Route path="/admin" element={<AdminPortal />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/pets" element={<PetList />} />

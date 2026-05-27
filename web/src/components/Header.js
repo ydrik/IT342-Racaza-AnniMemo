@@ -11,6 +11,21 @@ const Header = () => {
     const [pets, setPets] = useState([]);
     const [reminders, setReminders] = useState([]);
     const [activeIdx, setActiveIdx] = useState(-1);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const rawUser = localStorage.getItem('user');
+        if (rawUser) {
+            try {
+                const user = JSON.parse(rawUser);
+                setIsAdmin(user.role === 'ROLE_ADMIN');
+            } catch (e) {
+                setIsAdmin(false);
+            }
+        } else {
+            setIsAdmin(false);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchSearchIndex = async () => {
@@ -248,6 +263,11 @@ const Header = () => {
                 </div>
 
                 <div style={styles.navbarActions}>
+                    {isAdmin && (
+                        <button onClick={() => navigate('/admin')} style={styles.adminButton}>
+                            🛡️ Admin Portal
+                        </button>
+                    )}
                     <button onClick={() => navigate('/settings')} style={styles.settingsButton}>
                         ⚙️ Settings
                     </button>
@@ -337,6 +357,16 @@ const styles = {
         display: 'flex',
         gap: '12px',
         alignItems: 'center'
+    },
+    adminButton: {
+        background: 'rgba(102, 126, 234, 0.1)',
+        border: '1.5px solid #667eea',
+        color: '#667eea',
+        borderRadius: '10px',
+        padding: '8px 14px',
+        fontWeight: '700',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease'
     },
     settingsButton: {
         background: 'transparent',
